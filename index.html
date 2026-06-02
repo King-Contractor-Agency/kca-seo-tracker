@@ -9,12 +9,7 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
   <style>
-    :root {
-      --bg:#06080A;--surface:#0D1117;--card:#13181F;--border:#1E2530;--border-soft:#252D3A;
-      --text:#EDF0F4;--muted:#8B939E;--dim:#5A6270;--blue:#3B82F6;--green:#10B981;
-      --yellow:#F59E0B;--red:#EF4444;--accent:#6366F1;--accent-h:#4F52DB;
-      --accent-m:rgba(99,102,241,0.12);--gold:#F5A623;
-    }
+    :root{--bg:#06080A;--surface:#0D1117;--card:#13181F;--border:#1E2530;--border-soft:#252D3A;--text:#EDF0F4;--muted:#8B939E;--dim:#5A6270;--blue:#3B82F6;--green:#10B981;--yellow:#F59E0B;--red:#EF4444;--accent:#6366F1;--accent-h:#4F52DB;--accent-m:rgba(99,102,241,0.12);--gold:#F5A623;}
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html{-webkit-font-smoothing:antialiased}
     body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-size:14px;line-height:1.5;min-height:100vh;display:flex}
@@ -76,7 +71,6 @@
     .badge-green{background:rgba(16,185,129,0.12);color:#34D399;border:1px solid rgba(16,185,129,0.2)}
     .badge-amber{background:rgba(245,158,11,0.12);color:#FCD34D;border:1px solid rgba(245,158,11,0.2)}
     .badge-red{background:rgba(239,68,68,0.12);color:#FCA5A5;border:1px solid rgba(239,68,68,0.2)}
-    .badge-indigo{background:rgba(99,102,241,0.12);color:#A5B4FC;border:1px solid rgba(99,102,241,0.2)}
     .badge-gray{background:rgba(90,98,112,0.2);color:var(--muted);border:1px solid var(--border)}
     .badge-live{background:rgba(16,185,129,0.15);color:#34D399;border:1px solid rgba(16,185,129,0.3);animation:pulseBadge 2s ease-in-out infinite}
     @keyframes pulseBadge{0%,100%{opacity:1}50%{opacity:0.6}}
@@ -96,13 +90,17 @@
     .stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color 0.15s,transform 0.15s}
     .stat-card:hover{border-color:var(--border-soft);transform:translateY(-1px)}
     .stat-top{height:3px;width:100%}
-    .stat-body{padding:14px 16px}
-    .stat-label{font-size:10px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+    .stat-body{padding:14px 16px;position:relative}
+    .stat-label{font-size:10px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--dim);margin-bottom:6px;display:flex;align-items:center;gap:6px}
     .stat-value{font-size:26px;font-weight:800;letter-spacing:-1px;line-height:1}
     .stat-sub{font-size:11px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:4px}
     .trend-up{color:#34D399}.trend-down{color:#F87171}.trend-flat{color:var(--dim)}
     @keyframes shimmer{0%,100%{opacity:0.4}50%{opacity:0.7}}
     .stat-loading{opacity:0.4;animation:shimmer 1.5s ease-in-out infinite}
+    .leads-toggle{position:absolute;top:10px;right:10px;display:flex;gap:2px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:2px}
+    .leads-toggle button{background:transparent;border:none;color:var(--dim);font-size:9px;font-weight:700;padding:3px 7px;border-radius:4px;cursor:pointer;font-family:'Sora',sans-serif;transition:all 0.15s}
+    .leads-toggle button:hover{color:var(--muted)}
+    .leads-toggle button.active{background:var(--accent);color:#fff}
     .section-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
     .section-title{font-size:13px;font-weight:700;letter-spacing:-0.2px}
     .section-line{flex:1;height:1px;background:var(--border)}
@@ -169,14 +167,17 @@
     .factor-check{width:18px;height:18px;border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:all 0.15s}
     .factor-check.on{background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.4);color:#34D399}
     .factor-check.off{background:var(--surface);border:1px solid var(--border);color:var(--dim)}
+    .factor-check:hover{border-color:var(--accent);transform:scale(1.08)}
     .factor-check.locked{cursor:default;opacity:0.85}
+    .factor-check.locked:hover{transform:none}
     .factor-check svg{width:11px;height:11px}
-    .factor-label{flex:1;color:var(--text);font-weight:500}
+    .factor-label{flex:1;color:var(--text);font-weight:500;cursor:pointer}
     .factor-pts{font-size:10px;color:var(--dim);font-family:'JetBrains Mono',monospace;margin-right:4px}
     .factor-tag{font-size:8px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;border-radius:4px;padding:2px 6px;flex-shrink:0}
     .factor-tag.live{background:rgba(16,185,129,0.12);color:#34D399}
-    .factor-tag.manual{background:rgba(99,102,241,0.12);color:#A5B4FC}
+    .factor-tag.manual{background:rgba(99,102,241,0.18);color:#A5B4FC;font-weight:800}
     .factor-tag.gsc{background:rgba(245,158,11,0.12);color:#FCD34D}
+    .factor-tag.unverified{background:rgba(90,98,112,0.18);color:var(--dim)}
     .factor-tag.auditing{background:rgba(252,211,77,0.12);color:#FCD34D;animation:pulseBadge 1s ease-in-out infinite}
     .chart-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px}
     .chart-card-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -222,11 +223,8 @@
   <div class="g-card">
     <div class="g-logo"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div>
     <div class="g-title">KCA <span>AI OS</span></div>
-    <div class="g-sub">Sign in with your <strong style="color:#818CF8">@kingcontractor.com</strong> Google account to access live SEO data, leads and rankings.</div>
-    <button class="g-signin-btn" onclick="startGoogleSignIn()">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-      Sign in with Google
-    </button>
+    <div class="g-sub">Sign in with your <strong style="color:#818CF8">@kingcontractor.com</strong> Google account to access live SEO data.</div>
+    <button class="g-signin-btn" onclick="startGoogleSignIn()"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>Sign in with Google</button>
     <div class="g-error" id="g-error"></div>
     <div class="g-footer">King Contractor Agency · @kingcontractor.com only</div>
   </div>
@@ -234,31 +232,23 @@
 
 <aside class="sidebar">
   <div class="sidebar-brand">
-    <div class="brand-row">
-      <div class="brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div>
-      <div><div class="brand-title">KCA <span class="ai">AI OS</span></div><div class="brand-sub">Intelligence Platform</div></div>
-      <div class="live-dot"></div>
-    </div>
+    <div class="brand-row"><div class="brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div><div><div class="brand-title">KCA <span class="ai">AI OS</span></div><div class="brand-sub">Intelligence Platform</div></div><div class="live-dot"></div></div>
     <div class="tool-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><div><div class="tool-chip-name"><span class="dean">SEO</span> TRACKER</div><div class="tool-chip-sub">Live GSC + Sheets + Docs</div></div></div>
   </div>
   <nav class="sidebar-nav">
     <div class="nav-section-label">Views</div>
-    <a class="nav-item active" onclick="switchView('overview')"><div class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>Portfolio Overview <div class="nav-dot"></div></a>
+    <a class="nav-item active" onclick="switchView('overview')"><div class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>Portfolio Overview<div class="nav-dot"></div></a>
     <a class="nav-item" onclick="switchView('leads')"><div class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>Live Leads Feed</a>
     <a class="nav-item" onclick="switchView('tracking')"><div class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>Client Detail</a>
     <a class="nav-item" onclick="switchView('reports')"><div class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>Report Generator</a>
-    <a class="nav-item" onclick="switchView('paused')"><div class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg></div>Paused Clients <span id="paused-count-badge" class="badge badge-gray" style="margin-left:auto;font-size:9px;padding:1px 6px">0</span></a>
+    <a class="nav-item" onclick="switchView('paused')"><div class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg></div>Paused Clients<span id="paused-count-badge" class="badge badge-gray" style="margin-left:auto;font-size:9px;padding:1px 6px">0</span></a>
     <div class="nav-section-label">Active Clients</div>
     <div id="client-nav-list"></div>
   </nav>
   <div class="sidebar-footer">
     <div class="platform-badge"><div class="pb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div><div><div class="pb-name">King Contractor AI</div><div class="pb-sub">10 sites · OAuth Live</div></div><div class="pb-live">LIVE</div></div>
     <button class="btn btn-ghost" style="width:100%;justify-content:center;font-size:12px;margin-bottom:8px;" onclick="copyAllData()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Export CSV</button>
-    <div id="user-chip" style="display:flex;align-items:center;gap:8px;background:var(--card);border-radius:8px;padding:8px 10px;margin-bottom:6px;">
-      <img id="user-avatar-img" style="width:24px;height:24px;border-radius:50%;flex-shrink:0;display:none" />
-      <div id="user-avatar-fb" style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#4F46E5);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0">K</div>
-      <div style="font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1" id="user-email-label">Signing in...</div>
-    </div>
+    <div id="user-chip" style="display:flex;align-items:center;gap:8px;background:var(--card);border-radius:8px;padding:8px 10px;margin-bottom:6px;"><img id="user-avatar-img" style="width:24px;height:24px;border-radius:50%;flex-shrink:0;display:none" /><div id="user-avatar-fb" style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#4F46E5);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0">K</div><div style="font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1" id="user-email-label">Signing in...</div></div>
     <button class="btn btn-ghost" style="width:100%;justify-content:center;font-size:12px;" onclick="signOut()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</button>
   </div>
 </aside>
@@ -275,12 +265,7 @@
 
   <div class="content">
     <div id="view-overview">
-      <div class="live-banner">
-        <div class="live-banner-dot"></div>
-        <span class="live-banner-text">LIVE DATA</span>
-        <span class="live-banner-sub">Sheets leads + GSC rankings + logbook + mastersheet + website crawl. Scores derived live — no placeholders. Refreshes every 5 minutes.</span>
-        <span class="live-banner-time" id="sheet-sync-time">Syncing...</span>
-      </div>
+      <div class="live-banner"><div class="live-banner-dot"></div><span class="live-banner-text">LIVE DATA</span><span class="live-banner-sub">Sheets leads + GSC + logbook + mastersheet + website crawl. Manual ticks always win and survive re-audits.</span><span class="live-banner-time" id="sheet-sync-time">Syncing...</span></div>
       <div class="stat-strip" id="stat-strip"></div>
       <div class="section-header"><div class="section-title">Client Portfolio</div><div class="section-line"></div><div class="section-action" onclick="switchView('leads')">View Live Leads Feed →</div></div>
       <div class="client-grid" id="client-grid"></div>
@@ -313,7 +298,7 @@
     </div>
 
     <div id="view-paused" style="display:none">
-      <div class="live-banner" style="background:linear-gradient(135deg,rgba(90,98,112,0.12),rgba(90,98,112,0.04));border-color:var(--border-soft)"><div class="live-banner-dot" style="background:var(--dim);animation:none"></div><span class="live-banner-text" style="color:var(--muted)">PAUSED</span><span class="live-banner-sub">These clients are excluded from active tracking — no Sheets, GSC, audits, or score calculations. Resume to bring back.</span></div>
+      <div class="live-banner" style="background:linear-gradient(135deg,rgba(90,98,112,0.12),rgba(90,98,112,0.04));border-color:var(--border-soft)"><div class="live-banner-dot" style="background:var(--dim);animation:none"></div><span class="live-banner-text" style="color:var(--muted)">PAUSED</span><span class="live-banner-sub">Excluded from active tracking. Resume to bring back.</span></div>
       <div class="section-header"><div class="section-title">Off-Contract / Paused Clients</div><div class="section-line"></div><span class="badge badge-gray" id="paused-count-header">0 paused</span></div>
       <div class="client-grid" id="paused-list"></div>
     </div>
@@ -348,84 +333,49 @@
 // CONFIG
 // ════════════════════════════════════════════════════
 const OAUTH_CLIENT_ID = '534572694815-ng35ie30ffhoukl0ont4evomi9j5ntc7.apps.googleusercontent.com';
-const SCOPES = [
-  'https://www.googleapis.com/auth/spreadsheets.readonly',
-  'https://www.googleapis.com/auth/webmasters.readonly',
-  'https://www.googleapis.com/auth/documents.readonly',
-  'email','profile'
-].join(' ');
-
+const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly','https://www.googleapis.com/auth/webmasters.readonly','https://www.googleapis.com/auth/documents.readonly','email','profile'].join(' ');
 const DEFAULT_PAUSED = ['5star-roofing'];
+const AUDIT_TTL_MS = 6 * 60 * 60 * 1000;
+const AUDIT_CACHE_VERSION = 'v3-2026-06';   // bump invalidates stale caches with old shape
 
-// Fetch backends for live website audits. Tried in order. First success wins.
-// 1. SAME-ORIGIN: /api/fetch (Vercel serverless function — must deploy api/fetch.js).
-//    No CORS, no rate limits, ~50ms response. Fastest and most reliable.
-// 2. ALLORIGINS:  public CORS proxy, works but slower and rate-limited under load.
-// 3. JINA READER: r.jina.ai — designed to serve any URL as readable text. Reliable
-//    final fallback. Returns markdown for HTML, raw for text files.
 const FETCH_BACKENDS = [
-  {
-    name: 'same-origin',
-    url: target => '/api/fetch?url=' + encodeURIComponent(target),
-    parse: async (res) => {
-      if (!res.ok) return { ok:false, status:res.status, text:'' };
-      const data = await res.json();
-      return { ok: data.ok, status: data.status, text: data.text || '' };
-    },
-  },
-  {
-    name: 'allorigins',
-    url: target => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(target),
-    parse: async (res) => ({ ok: res.ok, status: res.status, text: await res.text() }),
-  },
-  {
-    name: 'jina-reader',
-    url: target => 'https://r.jina.ai/' + target,
-    parse: async (res) => ({ ok: res.ok, status: res.status, text: await res.text() }),
-  },
+  { name:'same-origin', url: t => '/api/fetch?url=' + encodeURIComponent(t), headers: null,
+    parse: async (res) => { if (!res.ok) return { ok:false, status:res.status, text:'' }; const d = await res.json(); return { ok:d.ok, status:d.status, text:d.text||'' }; }},
+  { name:'allorigins',  url: t => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(t), headers: null,
+    parse: async (res) => ({ ok:res.ok, status:res.status, text:await res.text() })},
+  { name:'jina-html',   url: t => 'https://r.jina.ai/' + t, headers: { 'X-Return-Format':'html' },
+    parse: async (res) => ({ ok:res.ok, status:res.status, text:await res.text() })},
+  { name:'jina-default',url: t => 'https://r.jina.ai/' + t, headers: null,
+    parse: async (res) => ({ ok:res.ok, status:res.status, text:await res.text() })},
 ];
 
-const AUDIT_TTL_MS = 6 * 60 * 60 * 1000;
 const chartRanges = {};
 
+// ════════════════════════════════════════════════════
+// FACTORS — pure schema. NO placeholder profiles. Scores reflect verified
+// reality only: web audit, logbook detection, or your manual click.
+// ════════════════════════════════════════════════════
 const FACTORS = {
-  metaOptimised:    { cat:'SEO',  pts:25, src:'live',   label:'Meta Title + Description Optimised', desc:'Title 25-65 chars + meta description 100-170 chars on homepage' },
-  technicalClean:   { cat:'SEO',  pts:20, src:'live',   label:'Technical Foundation Clean',         desc:'robots.txt + sitemap.xml both reachable' },
-  backlinksAudited: { cat:'SEO',  pts:20, src:'manual', label:'Backlinks Audited',                  desc:'Toxic link disavow + outreach pipeline running' },
-  keywordMapBuilt:  { cat:'SEO',  pts:15, src:'manual', label:'Keyword Map Built',                  desc:'Service + location keyword map tracked in DEAN' },
-  llmsTxtDone:      { cat:'AEO',  pts:25, src:'live',   label:'llms.txt Deployed',                  desc:'Domain serves a non-empty /llms.txt file' },
-  faqSchemaDone:    { cat:'AEO',  pts:25, src:'live',   label:'FAQ Schema Implemented',             desc:'Homepage JSON-LD contains FAQPage' },
-  aeoIntroDone:     { cat:'AEO',  pts:20, src:'live',   label:'Answer-First Intro',                 desc:'Homepage opens with a direct, citation-ready answer' },
-  aeoBlogsDone:     { cat:'AEO',  pts:15, src:'manual', label:'AEO Blog Program Active',            desc:'Educational blog posts published with AEO intros' },
-  aiCrawlerOpen:    { cat:'AEO',  pts:15, src:'live',   label:'AI Crawlers Allowed',                desc:'robots.txt does not block GPTBot, ClaudeBot, Google-Extended, PerplexityBot' },
-  gbpOptimised:     { cat:'LSEO', pts:30, src:'manual', label:'GBP Verified + Optimised',           desc:'Google Business Profile verified, categories + services filled' },
-  citationsComplete:{ cat:'LSEO', pts:25, src:'manual', label:'Citations Complete',                 desc:'NAP consistent across top 50 directories (BrightLocal)' },
-  gbpPostsActive:   { cat:'LSEO', pts:20, src:'manual', label:'GBP Posts Active',                   desc:'Monthly GBP post cadence running' },
-  localSchemaDone:  { cat:'LSEO', pts:15, src:'live',   label:'LocalBusiness Schema',               desc:'Homepage JSON-LD has LocalBusiness/RoofingContractor type' },
-  reviewVelocity:   { cat:'LSEO', pts:10, src:'manual', label:'Review Velocity Active',             desc:'Review request campaign running, new reviews monthly' },
-};
-
-const CLIENT_PROFILES = {
-  'horvath-roofing':            { metaOptimised:true,  technicalClean:true,  backlinksAudited:true,  keywordMapBuilt:true,  llmsTxtDone:true,  faqSchemaDone:true,  aeoIntroDone:true,  aeoBlogsDone:true,  aiCrawlerOpen:true,  gbpOptimised:true,  citationsComplete:true,  gbpPostsActive:true,  localSchemaDone:true,  reviewVelocity:true  },
-  'spennato-roofing':           { metaOptimised:true,  technicalClean:true,  backlinksAudited:true,  keywordMapBuilt:true,  llmsTxtDone:false, faqSchemaDone:false, aeoIntroDone:true,  aeoBlogsDone:true,  aiCrawlerOpen:true,  gbpOptimised:true,  citationsComplete:true,  gbpPostsActive:true,  localSchemaDone:false, reviewVelocity:false },
-  'link-exteriors':             { metaOptimised:true,  technicalClean:true,  backlinksAudited:true,  keywordMapBuilt:true,  llmsTxtDone:false, faqSchemaDone:false, aeoIntroDone:true,  aeoBlogsDone:true,  aiCrawlerOpen:true,  gbpOptimised:true,  citationsComplete:true,  gbpPostsActive:true,  localSchemaDone:false, reviewVelocity:false },
-  '5star-roofing':              { metaOptimised:true,  technicalClean:false, backlinksAudited:true,  keywordMapBuilt:true,  llmsTxtDone:true,  faqSchemaDone:false, aeoIntroDone:true,  aeoBlogsDone:true,  aiCrawlerOpen:true,  gbpOptimised:true,  citationsComplete:true,  gbpPostsActive:true,  localSchemaDone:false, reviewVelocity:false },
-  'highpoint-construction':     { metaOptimised:true,  technicalClean:true,  backlinksAudited:true,  keywordMapBuilt:true,  llmsTxtDone:false, faqSchemaDone:false, aeoIntroDone:true,  aeoBlogsDone:true,  aiCrawlerOpen:true,  gbpOptimised:true,  citationsComplete:true,  gbpPostsActive:true,  localSchemaDone:false, reviewVelocity:false },
-  'colorado-preferred-roofing': { metaOptimised:true,  technicalClean:true,  backlinksAudited:true,  keywordMapBuilt:true,  llmsTxtDone:true,  faqSchemaDone:true,  aeoIntroDone:true,  aeoBlogsDone:true,  aiCrawlerOpen:true,  gbpOptimised:true,  citationsComplete:true,  gbpPostsActive:true,  localSchemaDone:true,  reviewVelocity:false },
-  'shingle-hut':                { metaOptimised:true,  technicalClean:true,  backlinksAudited:false, keywordMapBuilt:true,  llmsTxtDone:false, faqSchemaDone:false, aeoIntroDone:true,  aeoBlogsDone:true,  aiCrawlerOpen:true,  gbpOptimised:true,  citationsComplete:true,  gbpPostsActive:true,  localSchemaDone:false, reviewVelocity:false },
-  'conway-roofing':             { metaOptimised:false, technicalClean:true,  backlinksAudited:false, keywordMapBuilt:true,  llmsTxtDone:true,  faqSchemaDone:false, aeoIntroDone:false, aeoBlogsDone:false, aiCrawlerOpen:true,  gbpOptimised:true,  citationsComplete:false, gbpPostsActive:false, localSchemaDone:false, reviewVelocity:false },
-  'all-heights-roofing':        { metaOptimised:true,  technicalClean:false, backlinksAudited:false, keywordMapBuilt:true,  llmsTxtDone:true,  faqSchemaDone:false, aeoIntroDone:true,  aeoBlogsDone:false, aiCrawlerOpen:true,  gbpOptimised:false, citationsComplete:false, gbpPostsActive:false, localSchemaDone:false, reviewVelocity:false },
-  'oneway-roof':                { metaOptimised:true,  technicalClean:true,  backlinksAudited:true,  keywordMapBuilt:true,  llmsTxtDone:false, faqSchemaDone:false, aeoIntroDone:true,  aeoBlogsDone:true,  aiCrawlerOpen:true,  gbpOptimised:true,  citationsComplete:true,  gbpPostsActive:true,  localSchemaDone:false, reviewVelocity:false },
+  metaOptimised:    { cat:'SEO',  pts:25, label:'Meta Title + Description Optimised', desc:'Title 25-65 chars + meta description 100-170 chars on homepage' },
+  technicalClean:   { cat:'SEO',  pts:20, label:'Technical Foundation Clean',         desc:'robots.txt + sitemap.xml both reachable' },
+  backlinksAudited: { cat:'SEO',  pts:20, label:'Backlinks Audited',                  desc:'Toxic link disavow + outreach pipeline running' },
+  keywordMapBuilt:  { cat:'SEO',  pts:15, label:'Keyword Map Built',                  desc:'Service + location keyword map tracked in DEAN' },
+  llmsTxtDone:      { cat:'AEO',  pts:25, label:'llms.txt Deployed',                  desc:'Domain serves a non-empty /llms.txt file' },
+  faqSchemaDone:    { cat:'AEO',  pts:25, label:'FAQ Schema Implemented',             desc:'Homepage JSON-LD contains FAQPage' },
+  aeoIntroDone:     { cat:'AEO',  pts:20, label:'Answer-First Intro',                 desc:'Homepage opens with a direct, citation-ready answer' },
+  aeoBlogsDone:     { cat:'AEO',  pts:15, label:'AEO Blog Program Active',            desc:'Educational blog posts published with AEO intros' },
+  aiCrawlerOpen:    { cat:'AEO',  pts:15, label:'AI Crawlers Allowed',                desc:'robots.txt does not block GPTBot/ClaudeBot/Google-Extended/PerplexityBot' },
+  gbpOptimised:     { cat:'LSEO', pts:30, label:'GBP Verified + Optimised',           desc:'Google Business Profile verified, categories + services filled' },
+  citationsComplete:{ cat:'LSEO', pts:25, label:'Citations Complete',                 desc:'NAP consistent across top 50 directories' },
+  gbpPostsActive:   { cat:'LSEO', pts:20, label:'GBP Posts Active',                   desc:'Monthly GBP post cadence running' },
+  localSchemaDone:  { cat:'LSEO', pts:15, label:'LocalBusiness Schema',               desc:'Homepage JSON-LD has LocalBusiness/RoofingContractor type' },
+  reviewVelocity:   { cat:'LSEO', pts:10, label:'Review Velocity Active',             desc:'Review request campaign running' },
 };
 
 // ════════════════════════════════════════════════════
 // PAUSE STATE
 // ════════════════════════════════════════════════════
-function ensureDefaultPausedSeeded() {
-  if (localStorage.getItem('kca-paused-clients') === null) {
-    localStorage.setItem('kca-paused-clients', JSON.stringify(DEFAULT_PAUSED));
-  }
-}
+function ensureDefaultPausedSeeded() { if (localStorage.getItem('kca-paused-clients') === null) localStorage.setItem('kca-paused-clients', JSON.stringify(DEFAULT_PAUSED)); }
 function getPausedClients() { try { return JSON.parse(localStorage.getItem('kca-paused-clients')) || []; } catch { return []; } }
 function isPaused(clientId) { return getPausedClients().includes(clientId); }
 function pauseClient(clientId) {
@@ -436,30 +386,40 @@ function pauseClient(clientId) {
 function unpauseClient(clientId) {
   const paused = getPausedClients().filter(id => id !== clientId);
   localStorage.setItem('kca-paused-clients', JSON.stringify(paused));
-  rebuildAllViews(); showToast('Client resumed — tracking active');
+  rebuildAllViews(); showToast('Client resumed');
 }
 function getActiveClients() { return CLIENTS.filter(c => !isPaused(c.id)); }
 function rebuildAllViews() {
   buildClientNav(); buildClientTabs(); buildClientGrid(); buildStatStrip(); buildReportClientDropdown(); updatePausedCount();
-  if (currentView === 'tracking') {
-    if (isPaused(selectedClientId)) { const next = getActiveClients()[0]; if (next) selectedClientId = next.id; }
-    renderTrackingDetail();
-  }
+  if (currentView === 'tracking') { if (isPaused(selectedClientId)) { const next = getActiveClients()[0]; if (next) selectedClientId = next.id; } renderTrackingDetail(); }
   if (currentView === 'paused') renderPausedView();
-  if (currentView === 'leads')  renderLeadsFeed();
+  if (currentView === 'leads') renderLeadsFeed();
 }
 
 // ════════════════════════════════════════════════════
 // LOCAL STORAGE
 // ════════════════════════════════════════════════════
 function getManualFlags(clientId) { try { return JSON.parse(localStorage.getItem('kca-flags-' + clientId)) || {}; } catch { return {}; } }
-function setManualFlag(clientId, flag, value) {
-  const flags = getManualFlags(clientId); flags[flag] = value;
-  localStorage.setItem('kca-flags-' + clientId, JSON.stringify(flags));
+function setManualFlag(clientId, flag, value) { const f = getManualFlags(clientId); f[flag] = value; localStorage.setItem('kca-flags-' + clientId, JSON.stringify(f)); }
+function getAuditCache(clientId) {
+  try {
+    const cached = JSON.parse(localStorage.getItem('kca-audit-' + clientId));
+    if (!cached || cached.version !== AUDIT_CACHE_VERSION) return null;
+    return cached;
+  } catch { return null; }
 }
-function getAuditCache(clientId) { try { return JSON.parse(localStorage.getItem('kca-audit-' + clientId)); } catch { return null; } }
-function setAuditCache(clientId, data) { localStorage.setItem('kca-audit-' + clientId, JSON.stringify({ timestamp: Date.now(), data })); }
+function setAuditCache(clientId, data) {
+  localStorage.setItem('kca-audit-' + clientId, JSON.stringify({ version: AUDIT_CACHE_VERSION, timestamp: Date.now(), data }));
+}
 function clearAuditCache(clientId) { localStorage.removeItem('kca-audit-' + clientId); }
+
+// Leads range — toggleable between 7/30/90 days, persisted
+function getLeadsRangeDays() { return parseInt(localStorage.getItem('kca-leads-range') || '7', 10); }
+function setLeadsRangeDays(days) {
+  localStorage.setItem('kca-leads-range', String(days));
+  buildStatStrip(); buildClientGrid();
+  if (currentView === 'tracking') renderTrackingDetail();
+}
 
 // ════════════════════════════════════════════════════
 // GOOGLE DOCS
@@ -470,7 +430,7 @@ async function fetchGoogleDoc(docId) {
     const res = await fetch('https://docs.googleapis.com/v1/documents/' + docId, { headers: { Authorization: 'Bearer ' + googleAccessToken } });
     if (!res.ok) { console.warn('[Docs]', docId, 'HTTP', res.status); return { ok:false, status:res.status, doc:null }; }
     return { ok:true, status:200, doc: await res.json() };
-  } catch (e) { console.warn('[Docs] error:', e.message); return { ok:false, status:0, doc:null }; }
+  } catch (e) { return { ok:false, status:0, doc:null }; }
 }
 function extractTextFromDoc(doc) {
   if (!doc || !doc.body || !doc.body.content) return '';
@@ -485,9 +445,7 @@ function extractTextFromDoc(doc) {
         const line = parts.join('').replace(/\s+/g, ' ').trim();
         if (line) lines.push(strike ? '✓ ' + line : line);
       }
-      if (el.table && el.table.tableRows) {
-        for (const row of el.table.tableRows) { for (const cell of row.tableCells || []) walk(cell.content); }
-      }
+      if (el.table && el.table.tableRows) for (const row of el.table.tableRows) for (const cell of row.tableCells || []) walk(cell.content);
     }
   };
   walk(doc.body.content);
@@ -495,31 +453,28 @@ function extractTextFromDoc(doc) {
 }
 
 // ════════════════════════════════════════════════════
-// MASTERSHEETS — multi-tab read
+// MASTERSHEETS
 // ════════════════════════════════════════════════════
 async function fetchAllSheetTabs(sheetId) {
   if (!sheetId || !googleAccessToken) return { ok:false, status:0, text:'', tabs:0, rows:0 };
   try {
     const metaRes = await fetch('https://sheets.googleapis.com/v4/spreadsheets/' + sheetId + '?fields=sheets.properties.title', { headers: { Authorization: 'Bearer ' + googleAccessToken } });
-    if (!metaRes.ok) { console.warn('[MasterSheet meta]', sheetId, 'HTTP', metaRes.status); return { ok:false, status:metaRes.status, text:'', tabs:0, rows:0 }; }
+    if (!metaRes.ok) return { ok:false, status:metaRes.status, text:'', tabs:0, rows:0 };
     const meta = await metaRes.json();
     const tabs = (meta.sheets || []).map(s => s.properties.title);
     if (!tabs.length) return { ok:true, status:200, text:'', tabs:0, rows:0 };
     const qs = tabs.map(t => 'ranges=' + encodeURIComponent(t + '!A1:Z500')).join('&');
     const valRes = await fetch('https://sheets.googleapis.com/v4/spreadsheets/' + sheetId + '/values:batchGet?' + qs, { headers: { Authorization: 'Bearer ' + googleAccessToken } });
-    if (!valRes.ok) { console.warn('[MasterSheet values]', sheetId, 'HTTP', valRes.status); return { ok:false, status:valRes.status, text:'', tabs:tabs.length, rows:0 }; }
+    if (!valRes.ok) return { ok:false, status:valRes.status, text:'', tabs:tabs.length, rows:0 };
     const data = await valRes.json();
     const lines = []; let totalRows = 0;
-    (data.valueRanges || []).forEach((vr, i) => {
-      lines.push('=== TAB: ' + tabs[i] + ' ===');
-      for (const row of vr.values || []) { lines.push(row.join(' | ')); totalRows++; }
-    });
+    (data.valueRanges || []).forEach((vr, i) => { lines.push('=== TAB: ' + tabs[i] + ' ==='); for (const row of vr.values || []) { lines.push(row.join(' | ')); totalRows++; } });
     return { ok:true, status:200, text:lines.join('\n'), tabs:tabs.length, rows:totalRows };
-  } catch (e) { console.warn('[MasterSheet] error:', e.message); return { ok:false, status:0, text:'', tabs:0, rows:0 }; }
+  } catch (e) { return { ok:false, status:0, text:'', tabs:0, rows:0 }; }
 }
 
 // ════════════════════════════════════════════════════
-// KEYWORD / COMPLETION PARSER
+// KEYWORD PARSER
 // ════════════════════════════════════════════════════
 const FACTOR_KEYWORDS = {
   metaOptimised:    { triggers:['meta title','meta description','title tag','meta tags','on-page','on page seo','snippet'] },
@@ -531,13 +486,12 @@ const FACTOR_KEYWORDS = {
   aeoIntroDone:     { triggers:['aeo intro','answer-first','answer first','aeo content','aeo optimization','aeo optimisation'] },
   aeoBlogsDone:     { triggers:['aeo blog','blog program','blog cluster','blog post','aeo content strategy','content cluster','topical authority'] },
   aiCrawlerOpen:    { triggers:['gptbot','claudebot','ai crawler','perplexitybot','google-extended','ai bots','ai bot access'] },
-  gbpOptimised:     { triggers:['gbp','google business profile','google my business','gmb','gbp verified','gbp optimised','gbp optimized','business profile'] },
+  gbpOptimised:     { triggers:['gbp','google business profile','google my business','gmb','gbp verified','gbp optimised','business profile'] },
   citationsComplete:{ triggers:['citation','brightlocal','nap consistency','directory listing','local citations','citation audit'] },
   gbpPostsActive:   { triggers:['gbp post','gmb post','gbp update','weekly post','monthly post','google post','business post'] },
   localSchemaDone:  { triggers:['localbusiness schema','local business schema','roofingcontractor schema','local schema','localbusiness markup'] },
   reviewVelocity:   { triggers:['review campaign','review velocity','review request','review generation','review automation','review acquisition'] },
 };
-
 const POSITIVE_MARKERS = ['✓','✅','☑','[x]','(x)','[X]','(X)','done','complete','completed','live','deployed','implemented','verified','published','finished','launched','set up','setup','optimised','optimized','100%'];
 const NEGATIVE_MARKERS = ['[ ]','( )','pending','to do','todo','tbd','wip','in progress','not done','not yet','missing','needed','unfinished','0%',' no ','n/a','none'];
 
@@ -546,74 +500,93 @@ function checkFactorInText(text, triggers, radius = 200) {
   const lower = text.toLowerCase();
   let totalScore = 0, hits = 0;
   for (const trigger of triggers) {
-    const tlower = trigger.toLowerCase();
+    const tl = trigger.toLowerCase();
     let idx = 0;
-    while ((idx = lower.indexOf(tlower, idx)) !== -1) {
+    while ((idx = lower.indexOf(tl, idx)) !== -1) {
       hits++;
       const start = Math.max(0, idx - radius);
-      const end   = Math.min(lower.length, idx + tlower.length + radius);
+      const end   = Math.min(lower.length, idx + tl.length + radius);
       const win   = lower.slice(start, end);
       let pos = 0, neg = 0;
       for (const m of POSITIVE_MARKERS) if (win.includes(m.toLowerCase())) pos++;
       for (const m of NEGATIVE_MARKERS) if (win.includes(m.toLowerCase())) neg++;
       totalScore += (pos - neg);
-      idx += tlower.length;
+      idx += tl.length;
     }
   }
   return { detected: totalScore > 0, hits, score: totalScore };
 }
 
 // ════════════════════════════════════════════════════
-// LIVE WEB AUDIT — fetches site assets via FETCH_BACKENDS chain
+// WEB FETCH — backend chain with retry + headers
 // ════════════════════════════════════════════════════
-async function fetchViaProxy(url) {
-  for (const backend of FETCH_BACKENDS) {
-    try {
-      const ctrl = new AbortController();
-      const timer = setTimeout(() => ctrl.abort(), 12000);
-      const res = await fetch(backend.url(url), { signal: ctrl.signal });
-      clearTimeout(timer);
-      const parsed = await backend.parse(res);
-      // Skip backend if it returned empty body even when 200 (some proxies do this)
-      if (!parsed.ok && parsed.status === 0) continue;
-      if (parsed.ok && (!parsed.text || parsed.text.length < 10)) {
-        // Allow if 200 but very small (could be tiny robots.txt). Otherwise try next.
-        if (parsed.text.length === 0) continue;
+async function fetchOnce(backend, url) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 15000);
+  try {
+    const opts = { signal: ctrl.signal };
+    if (backend.headers) opts.headers = backend.headers;
+    const res = await fetch(backend.url(url), opts);
+    clearTimeout(timer);
+    return await backend.parse(res);
+  } catch (e) { clearTimeout(timer); return { ok:false, status:0, text:'' }; }
+}
+async function fetchViaProxy(url, expectHtml = false) {
+  const chain = expectHtml ? FETCH_BACKENDS.filter(b => b.name !== 'jina-default') : FETCH_BACKENDS;
+  for (const backend of chain) {
+    const r = await fetchOnce(backend, url);
+    if (r.ok && r.text && r.text.length >= 5) {
+      if (expectHtml) {
+        const sample = r.text.slice(0, 2000).toLowerCase();
+        if (!/<html|<!doctype|<head|<body|<script|<meta|<title/.test(sample)) continue;
       }
-      return { ...parsed, backend: backend.name };
-    } catch (e) {
-      // try next backend
+      return { ...r, backend: backend.name };
+    }
+  }
+  await new Promise(r => setTimeout(r, 1000));
+  for (const backend of chain) {
+    const r = await fetchOnce(backend, url);
+    if (r.ok && r.text && r.text.length >= 5) {
+      if (expectHtml) {
+        const sample = r.text.slice(0, 2000).toLowerCase();
+        if (!/<html|<!doctype|<head|<body|<script|<meta|<title/.test(sample)) continue;
+      }
+      return { ...r, backend: backend.name, retried: true };
     }
   }
   return { ok:false, status:0, text:'', backend:'none' };
 }
 
+// ════════════════════════════════════════════════════
+// HTML PARSERS
+// ════════════════════════════════════════════════════
 function checkMeta(html) {
   const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-  const descMatch  = html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i);
+  const descMatch  = html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i) ||
+                     html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']description["']/i);
   const title = titleMatch ? titleMatch[1].trim() : '';
   const desc  = descMatch  ? descMatch[1].trim()  : '';
-  return title.length >= 25 && title.length <= 65 && desc.length >= 100 && desc.length <= 170;
+  return title.length >= 15 && title.length <= 75 && desc.length >= 70 && desc.length <= 200;
 }
 function checkAeoIntro(html) {
-  const m = html.match(/<p[^>]*>([\s\S]*?)<\/p>/i);
+  const cleaned = html.replace(/<script[\s\S]*?<\/script>/gi,'').replace(/<style[\s\S]*?<\/style>/gi,'');
+  const m = cleaned.match(/<p[^>]*>([\s\S]*?)<\/p>/i);
   if (!m) return false;
   const txt = m[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
-  if (txt.length < 60 || txt.length > 500) return false;
-  return /^[A-Z][^.!?]{40,}[.!?]/.test(txt);
+  if (txt.length < 50 || txt.length > 600) return false;
+  return /^[A-Z]/.test(txt) && /[.!?]/.test(txt);
 }
 function checkAiCrawlersAllowed(robotsTxt) {
-  if (!robotsTxt) return true;
-  const bots = ['GPTBot','ClaudeBot','Google-Extended','PerplexityBot','anthropic-ai','CCBot'];
+  if (!robotsTxt) return false; // no robots = can't confirm allowed
+  const bots = ['gptbot','claudebot','google-extended','perplexitybot','anthropic-ai','ccbot'];
   const lines = robotsTxt.split(/\r?\n/);
   let currentAgents = []; let blocked = false;
   for (const raw of lines) {
     const line = raw.trim();
     if (!line || line.startsWith('#')) continue;
     if (/^user-agent:/i.test(line)) {
-      const agent = line.split(':')[1].trim();
-      if (bots.some(b => agent.toLowerCase() === b.toLowerCase())) currentAgents = [agent.toLowerCase()];
-      else currentAgents = [];
+      const agent = line.split(':')[1].trim().toLowerCase();
+      currentAgents = bots.some(b => agent === b) ? [agent] : [];
     } else if (/^disallow:/i.test(line) && currentAgents.length) {
       const path = line.split(':').slice(1).join(':').trim();
       if (path === '/' || path === '*') { blocked = true; break; }
@@ -624,72 +597,102 @@ function checkAiCrawlersAllowed(robotsTxt) {
 function checkJsonLdType(html, types) {
   const scripts = [...html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)];
   for (const m of scripts) {
-    const body = m[1];
-    for (const t of types) { const re = new RegExp('"@type"\\s*:\\s*"?' + t + '"?', 'i'); if (re.test(body)) return true; }
+    for (const t of types) { const re = new RegExp('"@type"\\s*:\\s*"?' + t + '"?', 'i'); if (re.test(m[1])) return true; }
   }
   return false;
 }
 
+// ════════════════════════════════════════════════════
+// AUDIT PIPELINE — fully serial web fetches per client
+// ════════════════════════════════════════════════════
 async function runLiveAudit(client, force = false) {
   if (!force) {
     const cached = getAuditCache(client.id);
     if (cached && cached.data && (Date.now() - cached.timestamp < AUDIT_TTL_MS)) return cached.data;
   }
   const base = client.gscSite.replace(/\/$/, '');
-  const [llms, robots, sitemap, home, docResp, sheetResp] = await Promise.all([
-    fetchViaProxy(base + '/llms.txt'),
-    fetchViaProxy(base + '/robots.txt'),
-    fetchViaProxy(base + '/sitemap.xml'),
-    fetchViaProxy(base + '/'),
-    fetchGoogleDoc(client.docId),
-    fetchAllSheetTabs(client.masterSheetId),
-  ]);
-  const webAudit = {
-    llmsTxtDone:    llms.ok && llms.text.trim().length > 30 && !/<html|<!doctype/i.test(llms.text.slice(0, 200)),
-    aiCrawlerOpen:  robots.ok ? checkAiCrawlersAllowed(robots.text) : true,
-    technicalClean: robots.ok && sitemap.ok,
-    faqSchemaDone:  home.ok && checkJsonLdType(home.text, ['FAQPage']),
-    localSchemaDone:home.ok && checkJsonLdType(home.text, ['LocalBusiness','RoofingContractor','HomeAndConstructionBusiness','ProfessionalService','Organization']),
-    metaOptimised:  home.ok && checkMeta(home.text),
-    aeoIntroDone:   home.ok && checkAeoIntro(home.text),
-  };
+
+  // Google APIs in parallel — they don't use the proxy
+  const googlePromise = Promise.all([fetchGoogleDoc(client.docId), fetchAllSheetTabs(client.masterSheetId)]);
+
+  // Web fetches SERIAL — one at a time
+  const llms    = await fetchViaProxy(base + '/llms.txt');
+  const robots  = await fetchViaProxy(base + '/robots.txt');
+  const sitemap = await fetchViaProxy(base + '/sitemap.xml');
+  const home    = await fetchViaProxy(base + '/', true);
+
+  const [docResp, sheetResp] = await googlePromise;
+
+  // Web audit — ONLY set keys we can confirm TRUE. Absent = "unverified" (not "false").
+  const web = {};
+  if (llms.ok && llms.text.trim().length > 30 && !/<html[\s>]|<!doctype/i.test(llms.text.slice(0, 200))) web.llmsTxtDone = true;
+  if (robots.ok && checkAiCrawlersAllowed(robots.text)) web.aiCrawlerOpen = true;
+  if (robots.ok && sitemap.ok) web.technicalClean = true;
+  const isHtml = home.ok && /<html[\s>]|<!doctype|<head[\s>]|<body[\s>]/i.test(home.text.slice(0, 3000));
+  if (isHtml) {
+    if (checkMeta(home.text))                                   web.metaOptimised   = true;
+    if (checkJsonLdType(home.text, ['FAQPage']))                web.faqSchemaDone   = true;
+    if (checkJsonLdType(home.text, ['LocalBusiness','RoofingContractor','HomeAndConstructionBusiness','ProfessionalService','Organization'])) web.localSchemaDone = true;
+    if (checkAeoIntro(home.text))                               web.aeoIntroDone    = true;
+  }
+
+  // Log audit — keyword/completion detection from logbook + mastersheet
   const docText   = docResp.doc ? extractTextFromDoc(docResp.doc) : '';
   const sheetText = sheetResp.text || '';
   const combined  = docText + '\n\n' + sheetText;
-  const logAudit = {}; const logDetails = {};
+  const log = {}; const logDetails = {};
   for (const [key, def] of Object.entries(FACTOR_KEYWORDS)) {
-    const result = checkFactorInText(combined, def.triggers);
-    logDetails[key] = result;
-    if (result.detected) logAudit[key] = true;
+    const r = checkFactorInText(combined, def.triggers);
+    logDetails[key] = r;
+    if (r.detected) log[key] = true;
   }
-  const merged = { ...logAudit, ...webAudit };
-  merged._meta = {
-    auditedAt: Date.now(),
-    web: { llmsStatus: llms.status, robotsStatus: robots.status, sitemapStatus: sitemap.status, homeStatus: home.status, backend: home.backend || 'none', llmsBackend: llms.backend, robotsBackend: robots.backend, sitemapBackend: sitemap.backend },
-    doc: { ok: docResp.ok, status: docResp.status, chars: docText.length },
-    sheet: { ok: sheetResp.ok, status: sheetResp.status, tabs: sheetResp.tabs, rows: sheetResp.rows, chars: sheetText.length },
-    logHits: Object.fromEntries(Object.entries(logDetails).map(([k,v]) => [k, v.hits])),
-    sources: { web: Object.keys(webAudit), log: Object.keys(logAudit) },
+
+  const audit = {
+    web, log,
+    _meta: {
+      auditedAt: Date.now(),
+      fetches: { llmsStatus:llms.status, robotsStatus:robots.status, sitemapStatus:sitemap.status, homeStatus:home.status, homeIsHtml:isHtml,
+                 llmsBackend:llms.backend, robotsBackend:robots.backend, sitemapBackend:sitemap.backend, homeBackend:home.backend },
+      doc:   { ok:docResp.ok, status:docResp.status, chars:docText.length },
+      sheet: { ok:sheetResp.ok, status:sheetResp.status, tabs:sheetResp.tabs, rows:sheetResp.rows, chars:sheetText.length },
+      logHits: Object.fromEntries(Object.entries(logDetails).map(([k,v]) => [k, v.hits])),
+    },
   };
-  setAuditCache(client.id, merged);
-  return merged;
+  setAuditCache(client.id, audit);
+  return audit;
 }
 
 // ════════════════════════════════════════════════════
-// SCORING
+// SCORING — NO PLACEHOLDERS. Only manual + verified audit.
+// Priority (highest wins):
+//   1. Manual flag (your explicit click) — ALWAYS WINS for both true and false
+//   2. Web audit TRUE (live verified)
+//   3. Log audit TRUE (logbook keyword detected)
+//   4. Default FALSE (unverified)
 // ════════════════════════════════════════════════════
 function getEffectiveFlags(clientId) {
-  const profile = CLIENT_PROFILES[clientId] || {};
   const manual  = getManualFlags(clientId);
   const client  = CLIENTS.find(c => c.id === clientId);
-  const live    = client && client.liveAudit ? client.liveAudit : {};
-  const out = { ...profile };
+  const audit   = (client && client.liveAudit) || { web:{}, log:{} };
+  const web = audit.web || {};
+  const log = audit.log || {};
+  const out = {};
   Object.keys(FACTORS).forEach(key => {
-    const f = FACTORS[key];
-    if (f.src === 'manual' && key in manual) out[key] = manual[key];
-    if (f.src === 'live'   && key in live)   out[key] = live[key];
+    if (key in manual)         out[key] = !!manual[key];          // 1 — manual ALWAYS wins, including FALSE
+    else if (web[key] === true) out[key] = true;                  // 2
+    else if (log[key] === true) out[key] = true;                  // 3
+    else                       out[key] = false;                  // 4 — unverified default
   });
   return out;
+}
+function getFlagSource(clientId, key) {
+  const manual = getManualFlags(clientId);
+  const client = CLIENTS.find(c => c.id === clientId);
+  const audit  = (client && client.liveAudit) || { web:{}, log:{} };
+  if (key in manual) return 'manual';
+  if (audit.web && audit.web[key] === true) return 'web';
+  if (audit.log && audit.log[key] === true) return 'log';
+  return 'unverified';
 }
 function calcScores(clientId, gscPosition) {
   const flags = getEffectiveFlags(clientId);
@@ -705,7 +708,7 @@ function calcScores(clientId, gscPosition) {
     else if (gscPosition <= 15) seo += 15;
     else if (gscPosition <= 20) seo += 10;
     else if (gscPosition <= 30) seo += 5;
-  } else seo += 5;
+  }
   return { seo: Math.min(seo, 100), aeo: Math.min(aeo, 100), lseo: Math.min(lseo, 100) };
 }
 
@@ -732,7 +735,7 @@ const SPAM_EMAILS = ['testbydev@gmail.com','dev@kingcontractor.com','analytics@k
 const SPAM_KEYWORDS = ['seo service','backlink','guest post','wikipedia','digital marketing agency','pay per click','rank higher','do not process','ignore this','link building service','content powered','speed-seo','monkey digital','zoomwings','magwitch','gfleads','ai employee','business broker','selling your business','financing options','domain for sale','social media marketing service','chatbot service','we can help your business rank'];
 const SPAM_NAMES = ['test','dev','testing','developer','king contractor','analytics','bot','bradley','michelle fernandes','duane','xrumer','speedyindex','gregorypaype'];
 function isSpam(row) {
-  const name=(row.name||'').toLowerCase(), email=(row.email||'').toLowerCase(), msg=(row.msg||'').toLowerCase(), phone=(row.phone||'').replace(/\D/g,'');
+  const name=(row.name||'').toLowerCase(),email=(row.email||'').toLowerCase(),msg=(row.msg||'').toLowerCase(),phone=(row.phone||'').replace(/\D/g,'');
   if (SPAM_EMAILS.some(s=>email.includes(s))) return true;
   if (SPAM_NAMES.some(s=>name.includes(s))) return true;
   if (phone.length>0&&(phone.length<7||['123456789','1234567890','0000000000','1111111111'].includes(phone))) return true;
@@ -746,13 +749,13 @@ function isSpam(row) {
 // STATE
 // ════════════════════════════════════════════════════
 let googleAccessToken = null;
-let tokenClient       = null;
-let allLiveLeads      = [];
-let currentFilter     = 'all';
-let selectedClientId  = CLIENTS[0].id;
-let generatedReports  = [];
-let currentView       = 'overview';
-let refreshInterval   = null;
+let tokenClient = null;
+let allLiveLeads = [];
+let currentFilter = 'all';
+let selectedClientId = CLIENTS[0].id;
+let generatedReports = [];
+let currentView = 'overview';
+let refreshInterval = null;
 
 // ════════════════════════════════════════════════════
 // OAUTH
@@ -804,16 +807,11 @@ async function fetchSheetOAuth(sheetId, sheetTab) {
   const range = encodeURIComponent((sheetTab||'Sheet1')+'!A1:Z2000');
   try {
     const res = await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+sheetId+'/values/'+range,{headers:{Authorization:'Bearer '+googleAccessToken}});
-    if (!res.ok) { console.warn('[Sheets]',sheetId,'HTTP',res.status); return []; }
-    const data = await res.json();
-    return parseSheetValues(data.values||[]);
-  } catch(e) { console.warn('[Sheets] error:',e.message); return []; }
+    if (!res.ok) return [];
+    return parseSheetValues((await res.json()).values||[]);
+  } catch(e) { return []; }
 }
-function parseSheetValues(rows) {
-  if (!rows||rows.length<2) return [];
-  const headers=rows[0];
-  return rows.slice(1).map(row=>{const o={};headers.forEach((h,i)=>{o[h]=row[i]||'';});return o;});
-}
+function parseSheetValues(rows) { if (!rows||rows.length<2) return []; const headers=rows[0]; return rows.slice(1).map(row=>{const o={};headers.forEach((h,i)=>{o[h]=row[i]||'';});return o;}); }
 function findCol(row, keywords) {
   const keys=Object.keys(row);
   for (const kw of keywords) {
@@ -823,22 +821,8 @@ function findCol(row, keywords) {
   }
   return '';
 }
-function normalizeRows(rows, client) {
-  return rows.map(row=>({
-    name:   findCol(row,['name|name-1','name-1','First Name','full name','name','Name']),
-    email:  findCol(row,['email|email-1','email-1','email','Email','e-mail']),
-    phone:  findCol(row,['phone|phone-1','phone-1','phone','Phone','mobile','tel']),
-    msg:    findCol(row,['textarea|textarea-1','textarea-1','Message','message','comment','project','description']),
-    date:   findCol(row,['Date|hidden-2','hidden-2','date','Date','submitted','timestamp']),
-    source: findCol(row,['Form|hidden-4','hidden-4','form','Form','source','page title']),
-    url:    findCol(row,['Page URL|hidden-3','hidden-3','page url','Page URL','url']),
-    client,
-  }));
-}
-function getGenuineLeads(rows, client) {
-  const normalized=normalizeRows(rows,client);
-  return normalized.filter(r=>r.name&&r.name.trim()&&!isSpam(r));
-}
+function normalizeRows(rows, client) { return rows.map(row=>({name:findCol(row,['name|name-1','name-1','First Name','full name','name','Name']),email:findCol(row,['email|email-1','email-1','email','Email','e-mail']),phone:findCol(row,['phone|phone-1','phone-1','phone','Phone','mobile','tel']),msg:findCol(row,['textarea|textarea-1','textarea-1','Message','message','comment','project','description']),date:findCol(row,['Date|hidden-2','hidden-2','date','Date','submitted','timestamp']),source:findCol(row,['Form|hidden-4','hidden-4','form','Form','source','page title']),url:findCol(row,['Page URL|hidden-3','hidden-3','page url','Page URL','url']),client})); }
+function getGenuineLeads(rows, client) { return normalizeRows(rows,client).filter(r=>r.name&&r.name.trim()&&!isSpam(r)); }
 
 // ════════════════════════════════════════════════════
 // GSC
@@ -864,19 +848,12 @@ async function fetchGSCRange(siteUrl, range) {
       fetch(base,{method:'POST',headers:hdrs,body:JSON.stringify({startDate:fmt(start),endDate:fmt(end),dimensions:[],rowLimit:1})}),
       fetch(base,{method:'POST',headers:hdrs,body:JSON.stringify({startDate:fmt(start),endDate:fmt(end),dimensions:['date'],rowLimit:500})}),
     ]);
-    if (!qRes.ok) { console.warn('[GSC]',siteUrl,'HTTP',qRes.status); return null; }
-    const qData = await qRes.json();
-    const tData = tRes.ok ? await tRes.json() : {};
-    const dData = dRes.ok ? await dRes.json() : {};
-    const t     = tData.rows?.[0] || {};
+    if (!qRes.ok) return null;
+    const qData = await qRes.json(); const tData = tRes.ok ? await tRes.json() : {}; const dData = dRes.ok ? await dRes.json() : {};
+    const t = tData.rows?.[0] || {};
     const daily = (dData.rows||[]).map(r=>({date:r.keys[0],clicks:Math.round(r.clicks),impressions:Math.round(r.impressions),ctr:parseFloat((r.ctr*100).toFixed(1)),position:parseFloat(r.position.toFixed(1))})).sort((a,b)=>a.date.localeCompare(b.date));
-    return {
-      clicks:Math.round(t.clicks||0), impressions:Math.round(t.impressions||0),
-      ctr:parseFloat(((t.ctr||0)*100).toFixed(1)), position:parseFloat((t.position||0).toFixed(1)),
-      topQueries:(qData.rows||[]).map(r=>({query:r.keys[0],clicks:Math.round(r.clicks),impressions:Math.round(r.impressions),ctr:parseFloat((r.ctr*100).toFixed(1)),position:parseFloat(r.position.toFixed(1))})),
-      daily, range,
-    };
-  } catch(e) { console.warn('[GSC] error:',e.message); return null; }
+    return { clicks:Math.round(t.clicks||0), impressions:Math.round(t.impressions||0), ctr:parseFloat(((t.ctr||0)*100).toFixed(1)), position:parseFloat((t.position||0).toFixed(1)), topQueries:(qData.rows||[]).map(r=>({query:r.keys[0],clicks:Math.round(r.clicks),impressions:Math.round(r.impressions),ctr:parseFloat((r.ctr*100).toFixed(1)),position:parseFloat(r.position.toFixed(1))})), daily, range };
+  } catch(e) { return null; }
 }
 async function fetchGSC(siteUrl) { return fetchGSCRange(siteUrl, '7d'); }
 
@@ -893,10 +870,7 @@ async function initDashboard() {
   buildStatStrip(); buildClientGrid(); renderLeadsFeed(); renderTrackingDetail();
   runAllAudits();
   if (refreshInterval) clearInterval(refreshInterval);
-  refreshInterval = setInterval(async () => {
-    await loadAllData(); buildStatStrip(); buildClientGrid(); renderLeadsFeed();
-    if (currentView==='tracking') renderTrackingDetail();
-  }, 5*60*1000);
+  refreshInterval = setInterval(async () => { await loadAllData(); buildStatStrip(); buildClientGrid(); renderLeadsFeed(); if (currentView==='tracking') renderTrackingDetail(); }, 5*60*1000);
 }
 async function runAllAudits(force = false) {
   const active = getActiveClients();
@@ -909,13 +883,14 @@ async function runAllAudits(force = false) {
     c.auditing = true;
     if (currentView === 'overview') buildClientGrid();
     if (currentView === 'tracking' && selectedClientId === c.id) renderTrackingDetail();
-    runLiveAudit(c, force).then(audit => {
-      c.liveAudit = audit; c.auditing = false;
-      if (currentView === 'overview') buildClientGrid();
-      if (currentView === 'tracking' && selectedClientId === c.id) renderTrackingDetail();
-      buildStatStrip();
-    }).catch(err => { console.warn('[Audit] failed for', c.id, err); c.auditing = false; });
-    await new Promise(r => setTimeout(r, 300));
+    try {
+      c.liveAudit = await runLiveAudit(c, force);
+    } catch (err) { console.warn('[Audit] failed', c.id, err); }
+    c.auditing = false;
+    if (currentView === 'overview') buildClientGrid();
+    if (currentView === 'tracking' && selectedClientId === c.id) renderTrackingDetail();
+    buildStatStrip();
+    await new Promise(r => setTimeout(r, 500));
   }
 }
 async function loadAllData() {
@@ -924,14 +899,10 @@ async function loadAllData() {
   allLiveLeads=[];
   await Promise.all(getActiveClients().map(async client=>{
     if (client.sheetId) {
-      try {
-        const rows=await fetchSheetOAuth(client.sheetId,client.sheetTab||'Sheet1');
-        const genuine=getGenuineLeads(rows,client);
-        client.liveLeads=genuine.length;
-        genuine.forEach(lead=>allLiveLeads.push({...lead,clientObj:client}));
-      } catch(e){console.warn('Sheet fail:',client.name);}
+      try { const rows=await fetchSheetOAuth(client.sheetId,client.sheetTab||'Sheet1'); const genuine=getGenuineLeads(rows,client); client.liveLeads=genuine.length; genuine.forEach(lead=>allLiveLeads.push({...lead,clientObj:client})); }
+      catch(e){}
     }
-    try { client.gscData=await fetchGSC(client.gscSite); } catch(e){console.warn('GSC fail:',client.name);}
+    try { client.gscData=await fetchGSC(client.gscSite); } catch(e){}
   }));
   allLiveLeads.sort((a,b)=>parseDateStr(b.date)-parseDateStr(a.date));
   ['sheet-sync-time','leads-sync-time'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=`Synced ${timeStr}`;});
@@ -956,30 +927,16 @@ function switchView(view) {
   if (ni[nm[view]]) ni[nm[view]].classList.add('active');
   if (view === 'paused') renderPausedView();
 }
-function updatePausedCount() {
-  const n = getPausedClients().length;
-  const nav = document.getElementById('paused-count-badge'); if (nav) nav.textContent = n;
-  const hdr = document.getElementById('paused-count-header'); if (hdr) hdr.textContent = n + ' paused';
-}
+function updatePausedCount() { const n = getPausedClients().length; const nav = document.getElementById('paused-count-badge'); if (nav) nav.textContent = n; const hdr = document.getElementById('paused-count-header'); if (hdr) hdr.textContent = n + ' paused'; }
 function renderPausedView() {
   updatePausedCount();
   const paused = CLIENTS.filter(c => isPaused(c.id));
   const container = document.getElementById('paused-list'); if (!container) return;
-  if (!paused.length) {
-    container.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg><p>No paused clients. All ${CLIENTS.length} clients actively tracked.</p></div>`;
-    return;
-  }
-  container.innerHTML = paused.map(c => `<div class="client-card" style="opacity:0.7;border-style:dashed">
-    <div class="client-card-head"><div class="client-avatar" style="background:${c.color}22;color:${c.color};filter:grayscale(0.4)">${c.initials}</div><div style="flex:1;min-width:0"><div class="client-name">${c.name}</div><div class="client-domain">${c.domain}</div><div style="font-size:10px;color:var(--dim);margin-top:2px">${c.location}</div></div><span class="badge badge-gray">PAUSED</span></div>
-    <div style="font-size:11px;color:var(--dim);padding:8px 0;border-top:1px solid var(--border);margin-top:8px;line-height:1.5">No active tracking. Sheets, GSC, and audits skipped. Frozen at last-known state.</div>
-    <div style="display:flex;gap:6px;margin-top:10px">
-      <button class="btn btn-primary" style="flex:1;justify-content:center;font-size:11px" onclick="unpauseClient('${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>Resume Tracking</button>
-      ${c.docId ? `<a class="btn btn-ghost" style="font-size:11px" href="https://docs.google.com/document/d/${c.docId}/edit" target="_blank" title="Open logbook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></a>` : ''}
-    </div>
-  </div>`).join('');
+  if (!paused.length) { container.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg><p>No paused clients. All ${CLIENTS.length} clients actively tracked.</p></div>`; return; }
+  container.innerHTML = paused.map(c => `<div class="client-card" style="opacity:0.7;border-style:dashed"><div class="client-card-head"><div class="client-avatar" style="background:${c.color}22;color:${c.color};filter:grayscale(0.4)">${c.initials}</div><div style="flex:1;min-width:0"><div class="client-name">${c.name}</div><div class="client-domain">${c.domain}</div><div style="font-size:10px;color:var(--dim);margin-top:2px">${c.location}</div></div><span class="badge badge-gray">PAUSED</span></div><div style="font-size:11px;color:var(--dim);padding:8px 0;border-top:1px solid var(--border);margin-top:8px">No active tracking. Frozen at last-known state.</div><div style="display:flex;gap:6px;margin-top:10px"><button class="btn btn-primary" style="flex:1;justify-content:center;font-size:11px" onclick="unpauseClient('${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>Resume</button>${c.docId ? `<a class="btn btn-ghost" style="font-size:11px" href="https://docs.google.com/document/d/${c.docId}/edit" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></a>` : ''}</div></div>`).join('');
 }
 function selectClient(id) {
-  if (isPaused(id)) { showToast('This client is paused. Resume from Paused tab first.'); switchView('paused'); return; }
+  if (isPaused(id)) { showToast('Client paused. Resume from Paused tab first.'); switchView('paused'); return; }
   selectedClientId=id;
   document.querySelectorAll('.client-card').forEach(c=>c.classList.remove('selected'));
   const card=document.querySelector(`.client-card[data-id="${id}"]`);if(card)card.classList.add('selected');
@@ -988,15 +945,13 @@ function selectClient(id) {
   renderTrackingDetail();
   if (currentView!=='tracking') switchView('tracking');
 }
-async function refreshAll() {
-  showToast('Refreshing live data...');
-  await loadAllData(); buildStatStrip(); buildClientGrid(); renderLeadsFeed();
-  if (currentView==='tracking') renderTrackingDetail();
-  showToast('All data refreshed');
-}
+async function refreshAll() { showToast('Refreshing...'); await loadAllData(); buildStatStrip(); buildClientGrid(); renderLeadsFeed(); if (currentView==='tracking') renderTrackingDetail(); showToast('Refreshed'); }
+
+// ════════════════════════════════════════════════════
+// MANUAL TOGGLE — sets explicit true/false, ALWAYS wins, survives re-audits
+// ════════════════════════════════════════════════════
 function toggleManualFlag(clientId, factorKey) {
-  const f = FACTORS[factorKey]; if (!f) return;
-  const current = getEffectiveFlags(clientId)[factorKey];
+  const current = !!getEffectiveFlags(clientId)[factorKey];
   setManualFlag(clientId, factorKey, !current);
   if (currentView === 'overview') buildClientGrid();
   if (currentView === 'tracking') renderTrackingDetail();
@@ -1006,18 +961,17 @@ async function reauditClient(clientId) {
   const c = CLIENTS.find(x => x.id === clientId); if (!c) return;
   clearAuditCache(clientId);
   c.auditing = true; renderTrackingDetail();
-  showToast('Re-auditing ' + c.name + '...');
+  showToast('Re-auditing ' + c.name + ' (manual ticks preserved)...');
   try { c.liveAudit = await runLiveAudit(c, true); showToast('Audit complete'); }
-  catch (e) { showToast('Audit failed: ' + e.message); }
-  c.auditing = false;
-  renderTrackingDetail(); buildClientGrid(); buildStatStrip();
+  catch (e) { showToast('Audit failed'); }
+  c.auditing = false; renderTrackingDetail(); buildClientGrid(); buildStatStrip();
 }
 
 // ════════════════════════════════════════════════════
 // BUILD UI
 // ════════════════════════════════════════════════════
 function buildStatStripLoading() {
-  document.getElementById('stat-strip').innerHTML=['Total Live Leads','Leads (7 Days)','GSC Connected','Avg. SEO Score','Active / Paused'].map(l=>
+  document.getElementById('stat-strip').innerHTML=['Total Live Leads','Leads (period)','GSC Connected','Avg. SEO Score','Active / Paused'].map(l=>
     `<div class="stat-card"><div class="stat-top" style="background:linear-gradient(90deg,#6366F180,#6366F120)"></div><div class="stat-body"><div class="stat-label">${l}</div><div class="stat-value stat-loading" style="color:#6366F1">...</div><div class="stat-sub"><span class="trend-flat">—</span> Loading...</div></div></div>`).join('');
 }
 function buildClientGridLoading() {
@@ -1025,60 +979,49 @@ function buildClientGridLoading() {
     `<div class="client-card" data-id="${c.id}"><div class="client-card-head"><div class="client-avatar" style="background:${c.color}22;color:${c.color}">${c.initials}</div><div><div class="client-name">${c.name}</div><div class="client-domain">${c.domain}</div></div><span class="badge badge-gray stat-loading">Loading</span></div><div style="height:60px;display:flex;align-items:center;justify-content:center"><div class="spinner"></div></div></div>`).join('');
 }
 function buildClientNav() {
-  const active = getActiveClients();
-  document.getElementById('client-nav-list').innerHTML = active.map(c=>
+  document.getElementById('client-nav-list').innerHTML = getActiveClients().map(c=>
     `<a class="nav-item" onclick="selectClient('${c.id}')" style="font-size:12px;"><div class="nav-item-icon" style="background:${c.color}22;"><span style="font-size:9px;font-weight:800;color:${c.color}">${c.initials}</span></div>${c.name.length>20?c.name.slice(0,20)+'…':c.name}</a>`).join('');
 }
+
 function buildStatStrip() {
   const active = getActiveClients();
+  const days = getLeadsRangeDays();
   const totalLeads=active.reduce((s,c)=>s+(typeof c.liveLeads==='number'?c.liveLeads:0),0);
   const gscOk=active.filter(c=>c.gscData).length;
   const avgSEO=active.length ? Math.round(active.reduce((s,c)=>s+c.seo,0)/active.length) : 0;
-  const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-7);
-  const recent7=allLiveLeads.filter(l=>parseDateStr(l.date)>=cutoff).length;
+  const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-days);
+  const periodLeads=allLiveLeads.filter(l=>parseDateStr(l.date)>=cutoff).length;
   const pausedCount = getPausedClients().length;
+
+  const rangeToggle = `<div class="leads-toggle">
+    ${[7,30,90].map(d=>`<button class="${d===days?'active':''}" onclick="setLeadsRangeDays(${d})">${d}D</button>`).join('')}
+  </div>`;
+
   const stats=[
-    {label:'Total Live Leads',  value:totalLeads,                sub:'From Google Sheets',          trend:'up',   color:'#6366F1'},
-    {label:'Leads (7 Days)',    value:recent7,                   sub:'Genuine homeowners',           trend:'up',   color:'#3B82F6'},
-    {label:'GSC Connected',     value:gscOk+'/'+active.length,  sub:'Live ranking data',            trend:gscOk===active.length?'up':'flat', color:'#10B981'},
-    {label:'Avg. SEO Score',    value:avgSEO+'%',               sub:'Across active clients',        trend:'flat', color:'#F5A623'},
-    {label:'Active / Paused',   value:active.length+' / '+pausedCount, sub:'Tracking '+active.length+' of '+CLIENTS.length, trend:pausedCount===0?'up':'flat', color:'#34D399'},
+    {label:'Total Live Leads',value:totalLeads,sub:'From Google Sheets',trend:'up',color:'#6366F1', extra:''},
+    {label:`Leads (${days}d)`,value:periodLeads,sub:'Genuine homeowners',trend:'up',color:'#3B82F6', extra:rangeToggle},
+    {label:'GSC Connected',value:gscOk+'/'+active.length,sub:'Live ranking data',trend:gscOk===active.length?'up':'flat',color:'#10B981', extra:''},
+    {label:'Avg. SEO Score',value:avgSEO+'%',sub:'Verified across active clients',trend:'flat',color:'#F5A623', extra:''},
+    {label:'Active / Paused',value:active.length+' / '+pausedCount,sub:'Tracking '+active.length+' of '+CLIENTS.length,trend:pausedCount===0?'up':'flat',color:'#34D399', extra:''},
   ];
-  document.getElementById('stat-strip').innerHTML=stats.map(s=>
-    `<div class="stat-card"><div class="stat-top" style="background:linear-gradient(90deg,${s.color}80,${s.color}20)"></div><div class="stat-body"><div class="stat-label">${s.label}</div><div class="stat-value" style="color:${s.color}">${s.value}</div><div class="stat-sub"><span class="trend-${s.trend}">${s.trend==='up'?'▲':s.trend==='down'?'▼':'—'}</span> ${s.sub}</div></div></div>`).join('');
+  document.getElementById('stat-strip').innerHTML=stats.map(s=>`<div class="stat-card"><div class="stat-top" style="background:linear-gradient(90deg,${s.color}80,${s.color}20)"></div><div class="stat-body">${s.extra}<div class="stat-label">${s.label}</div><div class="stat-value" style="color:${s.color}">${s.value}</div><div class="stat-sub"><span class="trend-${s.trend}">${s.trend==='up'?'▲':s.trend==='down'?'▼':'—'}</span> ${s.sub}</div></div></div>`).join('');
 }
+
 function buildClientGrid() {
-  const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-7);
+  const days = getLeadsRangeDays();
+  const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-days);
   document.getElementById('client-grid').innerHTML=getActiveClients().map(c=>{
     const recent=allLiveLeads.filter(l=>l.clientObj.id===c.id&&parseDateStr(l.date)>=cutoff).length;
     const total=typeof c.liveLeads==='number'?c.liveLeads:'—';
     const gsc=c.gscData;
-    return `<div class="client-card" data-id="${c.id}" onclick="selectClient('${c.id}')">
-      <div class="client-card-head">
-        <div class="client-avatar" style="background:${c.color}22;color:${c.color}">${c.initials}</div>
-        <div style="flex:1;min-width:0"><div class="client-name">${c.name}</div><div class="client-domain">${c.domain}</div><div style="font-size:10px;color:var(--dim);margin-top:2px">${c.location}</div></div>
-        <div class="client-status">${statusBadge(c)}</div>
-      </div>
-      <div class="score-row">${scorePill('SEO',c.seo,c.auditing)}${scorePill('AEO',c.aeo,c.auditing)}${scorePill('LSEO',c.lseo,c.auditing)}</div>
-      <div class="client-metrics">
-        <div class="client-metric"><div class="cm-label">Leads</div><div class="cm-value" style="color:var(--accent)">${total}</div><div class="cm-trend" style="font-size:9px;color:#34D399">Live</div></div>
-        <div class="client-metric"><div class="cm-label">7d</div><div class="cm-value" style="color:var(--blue)">${recent}</div><div class="cm-trend" style="font-size:9px;color:var(--dim)">genuine</div></div>
-        <div class="client-metric"><div class="cm-label">Clicks</div><div class="cm-value" style="color:${gsc?'#34D399':'var(--dim)'}">${gsc?gsc.clicks.toLocaleString():'—'}</div><div class="cm-trend" style="font-size:9px">${gsc?'GSC 7d':'no data'}</div></div>
-        <div class="client-metric"><div class="cm-label">Avg Pos</div><div class="cm-value" style="color:${gsc?'#FCD34D':'var(--dim)'}">${gsc?gsc.position:'—'}</div><div class="cm-trend" style="font-size:9px">${gsc?gsc.ctr+'% CTR':''}</div></div>
-      </div>
-    </div>`;
+    return `<div class="client-card" data-id="${c.id}" onclick="selectClient('${c.id}')"><div class="client-card-head"><div class="client-avatar" style="background:${c.color}22;color:${c.color}">${c.initials}</div><div style="flex:1;min-width:0"><div class="client-name">${c.name}</div><div class="client-domain">${c.domain}</div><div style="font-size:10px;color:var(--dim);margin-top:2px">${c.location}</div></div><div class="client-status">${statusBadge(c)}</div></div><div class="score-row">${scorePill('SEO',c.seo,c.auditing)}${scorePill('AEO',c.aeo,c.auditing)}${scorePill('LSEO',c.lseo,c.auditing)}</div><div class="client-metrics"><div class="client-metric"><div class="cm-label">Leads</div><div class="cm-value" style="color:var(--accent)">${total}</div><div class="cm-trend" style="font-size:9px;color:#34D399">Live</div></div><div class="client-metric"><div class="cm-label">${days}d</div><div class="cm-value" style="color:var(--blue)">${recent}</div><div class="cm-trend" style="font-size:9px;color:var(--dim)">genuine</div></div><div class="client-metric"><div class="cm-label">Clicks</div><div class="cm-value" style="color:${gsc?'#34D399':'var(--dim)'}">${gsc?gsc.clicks.toLocaleString():'—'}</div><div class="cm-trend" style="font-size:9px">${gsc?'GSC 7d':'no data'}</div></div><div class="client-metric"><div class="cm-label">Avg Pos</div><div class="cm-value" style="color:${gsc?'#FCD34D':'var(--dim)'}">${gsc?gsc.position:'—'}</div><div class="cm-trend" style="font-size:9px">${gsc?gsc.ctr+'% CTR':''}</div></div></div></div>`;
   }).join('');
 }
 function buildClientTabs() {
   const active = getActiveClients();
-  document.getElementById('client-tabs').innerHTML = active.map((c,i)=>
-    `<div class="tab ${c.id===selectedClientId?'active':(i===0&&!active.find(x=>x.id===selectedClientId)?'active':'')}" data-id="${c.id}" onclick="selectClientTab('${c.id}',this)">${c.initials}</div>`).join('');
+  document.getElementById('client-tabs').innerHTML = active.map(c=>`<div class="tab ${c.id===selectedClientId?'active':''}" data-id="${c.id}" onclick="selectClientTab('${c.id}',this)">${c.initials}</div>`).join('');
 }
-function selectClientTab(id, el) {
-  selectedClientId=id;
-  document.querySelectorAll('.tab[data-id]').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active'); renderTrackingDetail();
-}
+function selectClientTab(id, el) { selectedClientId=id; document.querySelectorAll('.tab[data-id]').forEach(t=>t.classList.remove('active')); el.classList.add('active'); renderTrackingDetail(); }
 function buildReportClientDropdown() {
   const sel=document.getElementById('report-client');
   sel.innerHTML='<option value="">Select client...</option>';
@@ -1088,32 +1031,13 @@ function buildReportClientDropdown() {
 // ════════════════════════════════════════════════════
 // LEADS FEED
 // ════════════════════════════════════════════════════
-function filterLeads(filter, btn) {
-  currentFilter=filter;
-  document.querySelectorAll('#view-leads .tab').forEach(t=>t.classList.remove('active'));
-  if(btn)btn.classList.add('active');
-  renderLeadsFeed();
-}
+function filterLeads(filter, btn) { currentFilter=filter; document.querySelectorAll('#view-leads .tab').forEach(t=>t.classList.remove('active')); if(btn)btn.classList.add('active'); renderLeadsFeed(); }
 function renderLeadsFeed() {
   const filtered=currentFilter==='all'?allLiveLeads:allLiveLeads.filter(l=>l.clientObj.id===currentFilter);
   const badge=document.getElementById('lead-count-badge');if(badge)badge.textContent=`${filtered.length} leads`;
   const body=document.getElementById('leads-feed-body');if(!body)return;
   if(!filtered.length){body.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><p>No genuine leads found yet.</p></div>`;return;}
-  body.innerHTML=filtered.slice(0,150).map(lead=>{
-    const c=lead.clientObj;
-    const ini=(lead.name||'?').split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();
-    const dateDisplay=lead.date?lead.date.split('/').slice(0,3).join('/'):'';
-    const phone=(lead.phone||'').replace(/[^0-9+() -]/g,'').slice(0,20);
-    const msg=(lead.msg||'').slice(0,80)+((lead.msg||'').length>80?'...':'');
-    return `<div class="lead-row">
-      <div class="lead-avatar" style="background:${c.color}22;color:${c.color}">${ini}</div>
-      <div style="flex:1;min-width:0"><div class="lead-name">${lead.name||'Unknown'}</div><div class="lead-client">${c.domain}</div></div>
-      ${phone?`<div class="lead-phone">${phone}</div>`:''}
-      ${msg?`<div class="lead-msg">${msg}</div>`:''}
-      <div class="lead-source">${(lead.source||'Form').replace(' Form','').slice(0,20)}</div>
-      <div class="lead-date">${dateDisplay}</div>
-    </div>`;
-  }).join('');
+  body.innerHTML=filtered.slice(0,150).map(lead=>{const c=lead.clientObj;const ini=(lead.name||'?').split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();const dateDisplay=lead.date?lead.date.split('/').slice(0,3).join('/'):'';const phone=(lead.phone||'').replace(/[^0-9+() -]/g,'').slice(0,20);const msg=(lead.msg||'').slice(0,80)+((lead.msg||'').length>80?'...':'');return `<div class="lead-row"><div class="lead-avatar" style="background:${c.color}22;color:${c.color}">${ini}</div><div style="flex:1;min-width:0"><div class="lead-name">${lead.name||'Unknown'}</div><div class="lead-client">${c.domain}</div></div>${phone?`<div class="lead-phone">${phone}</div>`:''}${msg?`<div class="lead-msg">${msg}</div>`:''}<div class="lead-source">${(lead.source||'Form').replace(' Form','').slice(0,20)}</div><div class="lead-date">${dateDisplay}</div></div>`;}).join('');
 }
 
 // ════════════════════════════════════════════════════
@@ -1121,48 +1045,33 @@ function renderLeadsFeed() {
 // ════════════════════════════════════════════════════
 function buildAuditDetailsPanel(client) {
   const a = client.liveAudit;
-  if (!a || !a._meta) {
-    return `<div class="detail-card" style="margin-bottom:16px"><div class="detail-card-header">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      <div class="detail-card-title">Live Data Sources</div>
-      <span style="margin-left:auto;font-size:11px;color:var(--dim)">${client.auditing?'Running first audit...':'Not yet audited'}</span>
-    </div></div>`;
-  }
+  if (!a || !a._meta) return `<div class="detail-card" style="margin-bottom:16px"><div class="detail-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div class="detail-card-title">Live Data Sources</div><span style="margin-left:auto;font-size:11px;color:var(--dim)">${client.auditing?'Running...':'Not yet audited — click any box below to set manually'}</span><button class="btn btn-ghost" style="margin-left:8px;padding:4px 10px;font-size:11px" onclick="reauditClient('${client.id}')" ${client.auditing?'disabled':''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>${client.auditing?'Auditing...':'Run audit'}</button></div></div>`;
   const m = a._meta;
+  // Defensive: handle both old (m.web.*) and new (m.fetches.*) cache shapes
+  const f = m.fetches || m.web || {};
+  const doc = m.doc || {};
+  const sheet = m.sheet || {};
   const ageMin = Math.round((Date.now() - m.auditedAt) / 60000);
   const ageLabel = ageMin < 1 ? 'Just now' : ageMin < 60 ? ageMin + 'm ago' : Math.round(ageMin/60) + 'h ago';
   const dot = (ok) => `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${ok?'#34D399':'#F87171'};margin-right:6px"></span>`;
   const backendLabel = (b) => b && b !== 'none' ? ` <span style="font-size:9px;color:var(--dim);padding:1px 5px;border:1px solid var(--border);border-radius:3px;margin-left:4px">${b}</span>` : '';
   const row = (label, ok, detail, backend) => `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;font-size:12px;border-bottom:1px solid var(--border)"><div style="flex:1">${dot(ok)}${label}${backendLabel(backend)}</div><div style="color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:11px">${detail}</div></div>`;
-  const webOk = m.web.homeStatus === 200;
   const logHits = Object.entries(m.logHits||{}).filter(([,n])=>n>0).length;
-  return `<div class="detail-card" style="margin-bottom:16px">
-    <div class="detail-card-header">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      <div class="detail-card-title">Live Data Sources — ${ageLabel}</div>
-      <button class="btn btn-ghost" style="margin-left:auto;padding:4px 10px;font-size:11px" onclick="reauditClient('${client.id}')" ${client.auditing?'disabled':''}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-        ${client.auditing?'Auditing...':'Re-audit'}
-      </button>
-    </div>
-    <div class="detail-card-body" style="padding:8px 16px">
-      ${row('Logbook (Google Doc)', m.doc.ok, m.doc.ok ? m.doc.chars.toLocaleString() + ' chars read' : 'HTTP ' + m.doc.status + (m.doc.status===403?' — re-auth needed':' — fetch failed'))}
-      ${row('MasterSheet (Google Sheet)', m.sheet.ok, m.sheet.ok ? m.sheet.tabs + ' tabs, ' + m.sheet.rows + ' rows, ' + m.sheet.chars.toLocaleString() + ' chars' : 'HTTP ' + m.sheet.status + ' — fetch failed')}
-      ${row('Homepage HTML', webOk, webOk ? '200 OK — meta + schema scanned' : 'HTTP ' + m.web.homeStatus, m.web.backend)}
-      ${row('robots.txt', m.web.robotsStatus===200, 'HTTP ' + m.web.robotsStatus, m.web.robotsBackend)}
-      ${row('sitemap.xml', m.web.sitemapStatus===200, 'HTTP ' + m.web.sitemapStatus, m.web.sitemapBackend)}
-      ${row('llms.txt', m.web.llmsStatus===200, 'HTTP ' + m.web.llmsStatus + (m.web.llmsStatus===200?' — file present':' — not deployed'), m.web.llmsBackend)}
-      <div style="display:flex;align-items:center;gap:10px;padding:6px 0;font-size:12px"><div style="flex:1">${dot(logHits>0)}Logbook keyword matches</div><div style="color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:11px">${logHits} of ${Object.keys(m.logHits||{}).length} factors detected</div></div>
-    </div>
-  </div>`;
+  return `<div class="detail-card" style="margin-bottom:16px"><div class="detail-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><div class="detail-card-title">Live Data Sources — ${ageLabel}</div><button class="btn btn-ghost" style="margin-left:auto;padding:4px 10px;font-size:11px" onclick="reauditClient('${client.id}')" ${client.auditing?'disabled':''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>${client.auditing?'Auditing...':'Re-audit'}</button></div><div class="detail-card-body" style="padding:8px 16px">
+    ${row('Logbook (Google Doc)', doc.ok, doc.ok ? (doc.chars||0).toLocaleString() + ' chars' : 'HTTP ' + (doc.status||0) + (doc.status===403?' — re-auth needed':''))}
+    ${row('MasterSheet (Google Sheet)', sheet.ok, sheet.ok ? (sheet.tabs||0) + ' tabs, ' + (sheet.rows||0) + ' rows' : 'HTTP ' + (sheet.status||0))}
+    ${row('Homepage HTML', f.homeStatus===200 && f.homeIsHtml, f.homeStatus===200 ? (f.homeIsHtml?'200 OK — HTML parsed':'200 — but not raw HTML') : 'HTTP ' + (f.homeStatus||0), f.homeBackend)}
+    ${row('robots.txt', f.robotsStatus===200, 'HTTP ' + (f.robotsStatus||0), f.robotsBackend)}
+    ${row('sitemap.xml', f.sitemapStatus===200, 'HTTP ' + (f.sitemapStatus||0), f.sitemapBackend)}
+    ${row('llms.txt', f.llmsStatus===200, 'HTTP ' + (f.llmsStatus||0) + (f.llmsStatus===200?' — present':''), f.llmsBackend)}
+    <div style="display:flex;align-items:center;gap:10px;padding:6px 0;font-size:12px"><div style="flex:1">${dot(logHits>0)}Logbook keyword matches</div><div style="color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:11px">${logHits} of ${Object.keys(m.logHits||{}).length} factors detected</div></div>
+    <div style="padding:8px 0 4px;font-size:10px;color:var(--dim);line-height:1.5"><strong style="color:var(--muted)">If web fetches fail or schema isn't detected:</strong> click any checkbox in the Score Factors panel below to mark it manually — that override is permanent and never reset by re-audits.</div>
+  </div></div>`;
 }
+
 function buildFactorPanel(client) {
   const flags = getEffectiveFlags(client.id);
-  const live  = client.liveAudit || {};
-  const manual= getManualFlags(client.id);
-  const logHits = (live._meta && live._meta.logHits) || {};
-  const webSources = (live._meta && live._meta.sources && live._meta.sources.web) || [];
-  const logSources = (live._meta && live._meta.sources && live._meta.sources.log) || [];
+  const manual = getManualFlags(client.id);
   const cats = { SEO: [], AEO: [], LSEO: [] };
   Object.keys(FACTORS).forEach(key => cats[FACTORS[key].cat].push(key));
   const scoreFor = cat => {
@@ -1171,7 +1080,6 @@ function buildFactorPanel(client) {
     if (cat === 'SEO') {
       const pos = client.gscData?.position || 0;
       if (pos > 0) { if (pos <= 10) total += 20; else if (pos <= 15) total += 15; else if (pos <= 20) total += 10; else if (pos <= 30) total += 5; }
-      else total += 5;
     }
     return Math.min(total, 100);
   };
@@ -1180,134 +1088,99 @@ function buildFactorPanel(client) {
     const rows = cats[cat].map(key => {
       const f = FACTORS[key];
       const on = !!flags[key];
-      const inManual = key in manual;
-      const inWeb = webSources.includes(key);
-      const inLog = logSources.includes(key);
-      const hits = logHits[key] || 0;
+      const source = getFlagSource(client.id, key);
+      const logHits = (client.liveAudit?._meta?.logHits?.[key]) || 0;
       let tag;
-      if (inManual)      tag = `<span class="factor-tag manual" title="User override">Manual</span>`;
-      else if (inWeb)    tag = `<span class="factor-tag live" title="Verified by live website crawl">Web</span>`;
-      else if (inLog)    tag = `<span class="factor-tag live" title="Detected ${hits} mention(s) in logbook + mastersheet">Log · ${hits}</span>`;
+      if (source === 'manual') tag = `<span class="factor-tag manual" title="Manual override — wins over audit, survives re-audits">Manual ${on?'✓':'✗'}</span>`;
+      else if (source === 'web') tag = `<span class="factor-tag live" title="Verified by live website crawl">Web ✓</span>`;
+      else if (source === 'log') tag = `<span class="factor-tag live" title="${logHits} mention(s) found in logbook + mastersheet">Log · ${logHits}</span>`;
       else if (client.auditing) tag = `<span class="factor-tag auditing">Auditing</span>`;
-      else               tag = `<span class="factor-tag manual" title="Baseline value">Manual</span>`;
-      const clickable = f.src === 'manual' || (!inWeb);
-      const lockedClass = clickable ? '' : 'locked';
-      const clickHandler = clickable ? `onclick="toggleManualFlag('${client.id}','${key}')"` : '';
-      const check = `<div class="factor-check ${on?'on':'off'} ${lockedClass}" ${clickHandler} title="${f.desc}">${on ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>` : ''}</div>`;
-      return `<div class="factor-row">${check}<div class="factor-label">${f.label}</div><div class="factor-pts">${f.pts} pts</div>${tag}</div>`;
+      else tag = `<span class="factor-tag unverified" title="Click checkbox to mark as done">Unverified</span>`;
+      // EVERY box is clickable — manual click always wins regardless of factor type
+      const check = `<div class="factor-check ${on?'on':'off'}" onclick="toggleManualFlag('${client.id}','${key}')" title="${f.desc} — click to toggle (permanent)">${on ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>` : ''}</div>`;
+      const label = `<div class="factor-label" onclick="toggleManualFlag('${client.id}','${key}')">${f.label}</div>`;
+      return `<div class="factor-row">${check}${label}<div class="factor-pts">${f.pts} pts</div>${tag}</div>`;
     }).join('');
     let gscRow = '';
     if (cat === 'SEO') {
       const pos = client.gscData?.position || 0;
-      const posPts = pos > 0 ? (pos <= 10 ? 20 : pos <= 15 ? 15 : pos <= 20 ? 10 : pos <= 30 ? 5 : 0) : 5;
-      const posOn = posPts >= 10;
+      const posPts = pos > 0 ? (pos <= 10 ? 20 : pos <= 15 ? 15 : pos <= 20 ? 10 : pos <= 30 ? 5 : 0) : 0;
+      const posOn = posPts >= 5;
       gscRow = `<div class="factor-row"><div class="factor-check ${posOn?'on':'off'} locked">${posOn ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>` : ''}</div><div class="factor-label">Avg. GSC Position ${pos>0?`(pos ${pos})`:'(no data)'}</div><div class="factor-pts">${posPts}/20 pts</div><span class="factor-tag gsc">GSC</span></div>`;
     }
     return `<div class="factor-section"><div class="factor-section-title" style="color:${color}">${cat} Score<span class="factor-section-title-score" style="color:${color}">${score}/100</span></div>${rows}${gscRow}</div>`;
   };
-  return `<div class="detail-card" style="margin-bottom:16px">
-    <div class="detail-card-header">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-      <div class="detail-card-title">Score Factors — Live + Manual</div>
+  const manualCount = Object.keys(manual).length;
+  return `<div class="detail-card" style="margin-bottom:16px"><div class="detail-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><div class="detail-card-title">Score Factors — Click any box to override permanently</div>${manualCount?`<span style="margin-left:auto;font-size:11px;color:var(--accent);font-weight:700">${manualCount} manual override${manualCount===1?'':'s'} active</span>`:''}</div><div class="detail-card-body">
+    ${buildSection('SEO', '#6366F1')}
+    ${buildSection('AEO', '#EC4899')}
+    ${buildSection('LSEO', '#34D399')}
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:10px;color:var(--dim);line-height:1.7">
+      <strong style="color:var(--muted)">How this works (no placeholders):</strong>
+      <span class="factor-tag manual" style="font-size:8px">Manual ✓/✗</span> your click — always wins, survives re-audits.
+      <span class="factor-tag live" style="font-size:8px">Web ✓</span> verified by crawling the live site.
+      <span class="factor-tag live" style="font-size:8px">Log · N</span> N mentions found in logbook + mastersheet.
+      <span class="factor-tag gsc" style="font-size:8px">GSC</span> from Search Console.
+      <span class="factor-tag unverified" style="font-size:8px">Unverified</span> no positive signal yet — click to mark done.
+      Priority: <strong>Manual → Web → Log → Unverified</strong>.
     </div>
-    <div class="detail-card-body">
-      ${buildSection('SEO',  '#6366F1')}
-      ${buildSection('AEO',  '#EC4899')}
-      ${buildSection('LSEO', '#34D399')}
-      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:10px;color:var(--dim);line-height:1.6">
-        <strong style="color:var(--muted)">Data sources:</strong>
-        <span class="factor-tag live" style="font-size:8px">Web</span> verified by live crawl (llms.txt, robots.txt, sitemap.xml, homepage JSON-LD + meta).
-        <span class="factor-tag live" style="font-size:8px">Log · N</span> detected in logbook + mastersheet (N = mentions found).
-        <span class="factor-tag gsc" style="font-size:8px">GSC</span> from Google Search Console.
-        <span class="factor-tag manual" style="font-size:8px">Manual</span> click to toggle. Priority: <strong>Manual → Web → Log → Baseline</strong>.
-      </div>
-    </div>
-  </div>`;
+  </div></div>`;
 }
 
 // ════════════════════════════════════════════════════
-// TRACKING DETAIL
+// TRACKING DETAIL (wrapped in try/catch so a single panel error can't blank the whole view)
 // ════════════════════════════════════════════════════
 function renderTrackingDetail() {
   const c=CLIENTS.find(x=>x.id===selectedClientId);if(!c)return;
+  const wrap = document.getElementById('tracking-detail');
+  if (!wrap) return;
+  try {
+    renderTrackingDetailInner(c, wrap);
+  } catch (err) {
+    console.error('[renderTrackingDetail] error', err);
+    wrap.innerHTML = `<div class="detail-card" style="padding:20px"><div style="color:#FCA5A5;font-weight:700;margin-bottom:8px">Render error</div><div style="font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-bottom:12px">${err.message}</div><button class="btn btn-ghost" onclick="clearAuditCache('${c.id}');location.reload()">Clear cache + reload</button></div>`;
+  }
+}
+
+function renderTrackingDetailInner(c, wrap) {
+  const days = getLeadsRangeDays();
   const activeRange=chartRanges[c.id]||'7d';
-  const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-7);
-  const recent7=allLiveLeads.filter(l=>l.clientObj.id===c.id&&parseDateStr(l.date)>=cutoff).length;
+  const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-days);
+  const recent=allLiveLeads.filter(l=>l.clientObj.id===c.id&&parseDateStr(l.date)>=cutoff).length;
   const totalLeads=typeof c.liveLeads==='number'?c.liveLeads:'—';
   const clientLeads=allLiveLeads.filter(l=>l.clientObj.id===c.id).slice(0,5);
   const gsc=c.gscData;
-  const alerts=generateAlerts(c,recent7,gsc);
+  const alerts=generateAlerts(c,recent,gsc);
   const rangeLabel={'7d':'7 Days','28d':'28 Days','90d':'90 Days','16m':'16 Months'}[activeRange]||'7 Days';
   const rangeBtns = ['7d','28d','90d','16m'].map(r=>`<button class="range-btn ${r===activeRange?'active':''}" onclick="changeChartRange('${c.id}','${r}',this)">${r==='16m'?'16M':r.toUpperCase()}</button>`).join('');
 
-  document.getElementById('tracking-detail').innerHTML = `
+  wrap.innerHTML = `
     <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
       <div style="width:48px;height:48px;border-radius:12px;background:${c.color}22;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:${c.color};flex-shrink:0">${c.initials}</div>
-      <div style="flex:1;min-width:200px">
-        <div style="font-size:16px;font-weight:700">${c.name}</div>
-        <div style="font-size:11px;color:var(--dim);font-family:'JetBrains Mono',monospace;margin-top:2px">${c.domain}</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:2px">${c.location} · ${c.ga4} · ${c.gtm}</div>
-      </div>
+      <div style="flex:1;min-width:200px"><div style="font-size:16px;font-weight:700">${c.name}</div><div style="font-size:11px;color:var(--dim);font-family:'JetBrains Mono',monospace;margin-top:2px">${c.domain}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${c.location} · ${c.ga4} · ${c.gtm}</div></div>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
         ${statusBadge(c)}
-        <span class="badge ${gsc?'badge-live':'badge-gray'}">${gsc?'GSC Live':'GSC —'}</span>
+        <span class="badge ${gsc?'badge-live':'badge-gray'}">${gsc?'GSC':'GSC —'}</span>
         <span class="badge ${c.liveAudit?'badge-live':'badge-gray'}">${c.auditing?'Auditing':c.liveAudit?'Audit Live':'Audit —'}</span>
-        ${c.docId ? `<a class="btn btn-ghost" style="padding:5px 10px;font-size:11px" href="https://docs.google.com/document/d/${c.docId}/edit" target="_blank" title="Open logbook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Logbook</a>` : ''}
-        ${c.masterSheetId ? `<a class="btn btn-ghost" style="padding:5px 10px;font-size:11px" href="https://docs.google.com/spreadsheets/d/${c.masterSheetId}/edit" target="_blank" title="Open MasterSheet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>MasterSheet</a>` : ''}
-        <button class="btn btn-ghost" style="padding:5px 10px;font-size:11px;border-color:rgba(239,68,68,0.3);color:#FCA5A5" onclick="if(confirm('Pause tracking for ${c.name.replace(/'/g,'\\\'')}? They will move to Paused Clients.')) pauseClient('${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>Pause</button>
+        ${c.docId ? `<a class="btn btn-ghost" style="padding:5px 10px;font-size:11px" href="https://docs.google.com/document/d/${c.docId}/edit" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Logbook</a>` : ''}
+        ${c.masterSheetId ? `<a class="btn btn-ghost" style="padding:5px 10px;font-size:11px" href="https://docs.google.com/spreadsheets/d/${c.masterSheetId}/edit" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>Sheet</a>` : ''}
+        <button class="btn btn-ghost" style="padding:5px 10px;font-size:11px;border-color:rgba(239,68,68,0.3);color:#FCA5A5" onclick="if(confirm('Pause ${c.name.replace(/'/g,'\\\'')}?')) pauseClient('${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>Pause</button>
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;">
-      ${kpiTile('Live Leads',totalLeads,'#6366F1')}
-      ${kpiTile('Leads 7d',recent7,'#3B82F6')}
-      ${kpiTile('Clicks',gsc?gsc.clicks.toLocaleString():'—','#F5A623')}
-      ${kpiTile('Avg. Pos.',gsc?gsc.position:'—','#10B981')}
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;">
-      ${kpiTile('Impressions',gsc?gsc.impressions.toLocaleString():'—','#8B5CF6')}
-      ${kpiTile('CTR',gsc?gsc.ctr+'%':'—','#EC4899')}
-    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;">${kpiTile('Live Leads',totalLeads,'#6366F1')}${kpiTile(`Leads ${days}d`,recent,'#3B82F6')}${kpiTile('Clicks',gsc?gsc.clicks.toLocaleString():'—','#F5A623')}${kpiTile('Avg. Pos.',gsc?gsc.position:'—','#10B981')}</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;">${kpiTile('Impressions',gsc?gsc.impressions.toLocaleString():'—','#8B5CF6')}${kpiTile('CTR',gsc?gsc.ctr+'%':'—','#EC4899')}</div>
     ${buildAuditDetailsPanel(c)}
     ${buildFactorPanel(c)}
-    <div class="chart-card">
-      <div class="chart-card-header">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#6366F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        <div class="chart-card-title">Organic Clicks</div>
-        <span style="font-size:11px;color:var(--dim);margin-left:4px">— ${rangeLabel}</span>
-        ${gsc?`<span style="margin-left:8px;font-size:11px;font-weight:700;color:#6366F1">${gsc.clicks.toLocaleString()} total</span>`:''}
-        <span style="margin-left:8px;" class="badge ${gsc&&gsc.daily&&gsc.daily.length?'badge-live':'badge-gray'}">${gsc&&gsc.daily&&gsc.daily.length?'Live':'No Data'}</span>
-        <div class="range-selector" id="range-clicks-${c.id}">${rangeBtns}</div>
-      </div>
-      <div class="chart-card-body" style="height:200px">${gsc&&gsc.daily&&gsc.daily.length?`<canvas id="chart-clicks-${c.id}"></canvas>`:noDataState('No GSC click data')}</div>
-    </div>
+    <div class="chart-card"><div class="chart-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="#6366F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><div class="chart-card-title">Organic Clicks</div><span style="font-size:11px;color:var(--dim);margin-left:4px">— ${rangeLabel}</span>${gsc?`<span style="margin-left:8px;font-size:11px;font-weight:700;color:#6366F1">${gsc.clicks.toLocaleString()}</span>`:''}<div class="range-selector" id="range-clicks-${c.id}">${rangeBtns}</div></div><div class="chart-card-body" style="height:200px">${gsc&&gsc.daily&&gsc.daily.length?`<canvas id="chart-clicks-${c.id}"></canvas>`:noDataState('No GSC click data')}</div></div>
     <div class="chart-grid">
-      <div class="chart-card">
-        <div class="chart-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><div class="chart-card-title">Impressions</div><span style="font-size:11px;color:var(--dim);margin-left:4px">— ${rangeLabel}</span>${gsc?`<span style="margin-left:auto;font-size:11px;font-weight:700;color:#10B981">${gsc.impressions.toLocaleString()}</span>`:''}</div>
-        <div class="chart-card-body" style="height:170px">${gsc&&gsc.daily&&gsc.daily.length?`<canvas id="chart-impr-${c.id}"></canvas>`:noDataState('No impression data')}</div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><div class="chart-card-title">Avg. Position</div><span style="font-size:11px;color:var(--dim);margin-left:4px">— ${rangeLabel} (lower = better)</span>${gsc?`<span style="margin-left:auto;font-size:11px;font-weight:700;color:#F59E0B">pos ${gsc.position}</span>`:''}</div>
-        <div class="chart-card-body" style="height:170px">${gsc&&gsc.daily&&gsc.daily.length?`<canvas id="chart-pos-${c.id}"></canvas>`:noDataState('No position data')}</div>
-      </div>
+      <div class="chart-card"><div class="chart-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><div class="chart-card-title">Impressions</div><span style="font-size:11px;color:var(--dim);margin-left:4px">— ${rangeLabel}</span>${gsc?`<span style="margin-left:auto;font-size:11px;font-weight:700;color:#10B981">${gsc.impressions.toLocaleString()}</span>`:''}</div><div class="chart-card-body" style="height:170px">${gsc&&gsc.daily&&gsc.daily.length?`<canvas id="chart-impr-${c.id}"></canvas>`:noDataState('No data')}</div></div>
+      <div class="chart-card"><div class="chart-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><div class="chart-card-title">Avg. Position</div><span style="font-size:11px;color:var(--dim);margin-left:4px">— ${rangeLabel}</span>${gsc?`<span style="margin-left:auto;font-size:11px;font-weight:700;color:#F59E0B">pos ${gsc.position}</span>`:''}</div><div class="chart-card-body" style="height:170px">${gsc&&gsc.daily&&gsc.daily.length?`<canvas id="chart-pos-${c.id}"></canvas>`:noDataState('No data')}</div></div>
     </div>
     <div class="detail-grid">
-      <div class="detail-card">
-        <div class="detail-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><div class="detail-card-title">Top GSC Queries — ${rangeLabel}</div><span style="margin-left:auto" class="badge ${gsc?'badge-live':'badge-gray'}">${gsc?'Live':'—'}</span></div>
-        <div class="detail-card-body">
-          <table class="kw-table"><thead><tr><th>Query</th><th>Clicks</th><th>Impr.</th><th>CTR</th><th>Pos.</th></tr></thead><tbody>
-            ${gsc&&gsc.topQueries.length?gsc.topQueries.map(q=>`<tr><td class="kw-query">${q.query}</td><td>${q.clicks}</td><td>${q.impressions.toLocaleString()}</td><td>${q.ctr}%</td><td>${posChip(q.position)}</td></tr>`).join(''):`<tr><td colspan="5" style="text-align:center;color:var(--dim);padding:16px">No GSC data</td></tr>`}
-          </tbody></table>
-        </div>
-      </div>
-      <div class="detail-card">
-        <div class="detail-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><div class="detail-card-title">Active Alerts</div></div>
-        <div class="detail-card-body">${alerts.map(a=>`<div class="alert-item"><div class="alert-icon">${alertIcon(a.severity)}</div><div><div class="alert-title">${a.title}</div><div class="alert-detail">${a.detail}</div><div class="alert-action">${a.action} →</div></div></div>`).join('')}</div>
-      </div>
+      <div class="detail-card"><div class="detail-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><div class="detail-card-title">Top GSC Queries</div><span style="margin-left:auto" class="badge ${gsc?'badge-live':'badge-gray'}">${gsc?'Live':'—'}</span></div><div class="detail-card-body"><table class="kw-table"><thead><tr><th>Query</th><th>Clicks</th><th>Impr.</th><th>CTR</th><th>Pos.</th></tr></thead><tbody>${gsc&&gsc.topQueries.length?gsc.topQueries.map(q=>`<tr><td class="kw-query">${q.query}</td><td>${q.clicks}</td><td>${q.impressions.toLocaleString()}</td><td>${q.ctr}%</td><td>${posChip(q.position)}</td></tr>`).join(''):`<tr><td colspan="5" style="text-align:center;color:var(--dim);padding:16px">No data</td></tr>`}</tbody></table></div></div>
+      <div class="detail-card"><div class="detail-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><div class="detail-card-title">Active Alerts</div></div><div class="detail-card-body">${alerts.map(a=>`<div class="alert-item"><div class="alert-icon">${alertIcon(a.severity)}</div><div><div class="alert-title">${a.title}</div><div class="alert-detail">${a.detail}</div></div></div>`).join('')}</div></div>
     </div>
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:16px">
-      <div class="detail-card-header" style="padding:14px 18px;border-bottom:1px solid var(--border);"><svg viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><div class="detail-card-title">Recent Genuine Leads</div><span class="badge badge-live" style="margin-left:auto">${totalLeads} total</span></div>
-      ${clientLeads.length?clientLeads.map(lead=>{const ini=(lead.name||'?').split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();return `<div class="lead-row"><div class="lead-avatar" style="background:${c.color}22;color:${c.color}">${ini}</div><div style="flex:1;min-width:0"><div class="lead-name">${lead.name}</div><div class="lead-client">${lead.date}</div></div><div class="lead-phone">${(lead.phone||'').slice(0,20)}</div><div class="lead-msg">${(lead.msg||'').slice(0,80)}</div><div class="lead-source">${(lead.source||'Form').replace(' Form','').slice(0,20)}</div></div>`;}).join(''):`<div class="empty-state" style="padding:20px"><p>Syncing leads via OAuth...</p></div>`}
-    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:16px"><div class="detail-card-header" style="padding:14px 18px;border-bottom:1px solid var(--border);"><svg viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><div class="detail-card-title">Recent Genuine Leads</div><span class="badge badge-live" style="margin-left:auto">${totalLeads} total</span></div>${clientLeads.length?clientLeads.map(lead=>{const ini=(lead.name||'?').split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();return `<div class="lead-row"><div class="lead-avatar" style="background:${c.color}22;color:${c.color}">${ini}</div><div style="flex:1;min-width:0"><div class="lead-name">${lead.name}</div><div class="lead-client">${lead.date}</div></div><div class="lead-phone">${(lead.phone||'').slice(0,20)}</div><div class="lead-msg">${(lead.msg||'').slice(0,80)}</div><div class="lead-source">${(lead.source||'Form').replace(' Form','').slice(0,20)}</div></div>`;}).join(''):`<div class="empty-state" style="padding:20px"><p>Syncing...</p></div>`}</div>
   `;
   if (gsc&&gsc.daily&&gsc.daily.length) setTimeout(()=>renderGSCCharts(c.id, gsc), 60);
 }
@@ -1318,16 +1191,14 @@ async function changeChartRange(clientId, range, btn) {
   if (container) { container.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active')); if (btn) btn.classList.add('active'); }
   const c = CLIENTS.find(x=>x.id===clientId); if (!c) return;
   ['chart-clicks-','chart-impr-','chart-pos-'].forEach(pfx=>{const el=document.getElementById(pfx+clientId);if(el){const ex=Chart.getChart(el);if(ex)ex.destroy();}});
-  showToast(`Loading ${range === '16m' ? '16 months' : range} of data...`);
-  try { c.gscData = await fetchGSCRange(c.gscSite, range); renderTrackingDetail(); }
-  catch(e) { showToast('Could not load range data'); }
+  showToast(`Loading ${range}...`);
+  try { c.gscData = await fetchGSCRange(c.gscSite, range); renderTrackingDetail(); } catch(e) { showToast('Failed'); }
 }
 
 function renderGSCCharts(clientId, gsc) {
   if (!gsc||!gsc.daily||!gsc.daily.length) return;
   const daily=gsc.daily;
-  const totalDays=daily.length;
-  const step = totalDays>300?30:totalDays>90?14:totalDays>28?7:totalDays>14?3:1;
+  const step = daily.length>300?30:daily.length>90?14:daily.length>28?7:daily.length>14?3:1;
   const labels=daily.map(d=>{const dt=new Date(d.date+'T00:00:00');return dt.toLocaleDateString('en-US',{month:'short',day:'numeric'});});
   const grid='rgba(255,255,255,0.04)', tick='#5A6270';
   const font={family:"'Sora', sans-serif",size:10};
@@ -1337,11 +1208,11 @@ function renderGSCCharts(clientId, gsc) {
   const xTicks={...scaleBase,ticks:{...scaleBase.ticks,maxRotation:0,callback:(v,i)=>i%step===0?labels[i]:''}};
   ['chart-clicks-','chart-impr-','chart-pos-'].forEach(pfx=>{const el=document.getElementById(pfx+clientId);if(el){const ex=Chart.getChart(el);if(ex)ex.destroy();}});
   const cc=document.getElementById('chart-clicks-'+clientId);
-  if(cc) new Chart(cc,{type:'line',data:{labels,datasets:[{...lineBase,label:'Clicks',data:daily.map(d=>d.clicks),borderColor:'#6366F1',backgroundColor:'rgba(99,102,241,0.08)',pointBackgroundColor:'#6366F1'}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:tip},scales:{x:xTicks,y:{...scaleBase,min:0}}}});
+  if(cc) new Chart(cc,{type:'line',data:{labels,datasets:[{...lineBase,data:daily.map(d=>d.clicks),borderColor:'#6366F1',backgroundColor:'rgba(99,102,241,0.08)'}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:tip},scales:{x:xTicks,y:{...scaleBase,min:0}}}});
   const ci=document.getElementById('chart-impr-'+clientId);
-  if(ci) new Chart(ci,{type:'line',data:{labels,datasets:[{...lineBase,label:'Impressions',data:daily.map(d=>d.impressions),borderColor:'#10B981',backgroundColor:'rgba(16,185,129,0.07)',pointBackgroundColor:'#10B981'}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:tip},scales:{x:xTicks,y:{...scaleBase,min:0}}}});
+  if(ci) new Chart(ci,{type:'line',data:{labels,datasets:[{...lineBase,data:daily.map(d=>d.impressions),borderColor:'#10B981',backgroundColor:'rgba(16,185,129,0.07)'}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:tip},scales:{x:xTicks,y:{...scaleBase,min:0}}}});
   const cp=document.getElementById('chart-pos-'+clientId);
-  if(cp) new Chart(cp,{type:'line',data:{labels,datasets:[{...lineBase,fill:false,label:'Avg Position',data:daily.map(d=>d.position),borderColor:'#F59E0B',backgroundColor:'rgba(245,158,11,0.06)',pointBackgroundColor:'#F59E0B'}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{...tip,callbacks:{label:ctx=>'Position '+ctx.parsed.y.toFixed(1)}}},scales:{x:xTicks,y:{...scaleBase,reverse:true,ticks:{...scaleBase.ticks,callback:v=>v.toFixed(0)}}}}});
+  if(cp) new Chart(cp,{type:'line',data:{labels,datasets:[{...lineBase,fill:false,data:daily.map(d=>d.position),borderColor:'#F59E0B'}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{...tip,callbacks:{label:ctx=>'Position '+ctx.parsed.y.toFixed(1)}}},scales:{x:xTicks,y:{...scaleBase,reverse:true,ticks:{...scaleBase.ticks,callback:v=>v.toFixed(0)}}}}});
 }
 
 function noDataState(msg) { return `<div class="no-data-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span>${msg}</span></div>`; }
@@ -1350,17 +1221,16 @@ function scorePill(label,val,auditing){const color=val>=70?'#34D399':val>=55?'#F
 function posChip(pos){const cls=pos<=3?'pos-1-3':pos<=10?'pos-4-10':pos<=20?'pos-11-20':'pos-rest';return`<span class="pos-chip ${cls}">${pos}</span>`;}
 function kpiTile(label,value,color){return`<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;"><div style="font-size:10px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--dim);margin-bottom:6px">${label}</div><div style="font-size:22px;font-weight:800;color:${color};letter-spacing:-0.5px;line-height:1">${value}</div></div>`;}
 function alertIcon(severity){const c={critical:'#F87171',high:'#FCD34D',medium:'#FCD34D',info:'#60A5FA'}[severity]||'#60A5FA';return`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;}
-function generateAlerts(c,recent7,gsc){
+function generateAlerts(c,recent,gsc){
   const a=[]; const flags = getEffectiveFlags(c.id);
-  if(c.aeo<45) a.push({severity:'high',title:'AEO Score Low',detail:`Score ${c.aeo} — AI visibility at risk.`,action:'Run AEO audit'});
-  if(c.seo<60) a.push({severity:'high',title:'SEO Score Below 60',detail:'Technical issues dragging score.',action:'Review audit'});
-  if(!flags.llmsTxtDone) a.push({severity:'medium',title:'llms.txt Missing',detail:'No llms.txt detected — AI crawlers cannot find guidance.',action:'Deploy llms.txt'});
-  if(!flags.faqSchemaDone) a.push({severity:'medium',title:'FAQ Schema Missing',detail:'No FAQPage JSON-LD on homepage.',action:'Implement schema'});
-  if(!flags.localSchemaDone) a.push({severity:'medium',title:'LocalBusiness Schema Missing',detail:'Add LocalBusiness or RoofingContractor schema.',action:'Implement schema'});
-  if(!c.sheetId) a.push({severity:'medium',title:'Sheet Not Configured',detail:'No Google Sheet linked.',action:'Add sheet ID'});
-  if(gsc&&gsc.position>15) a.push({severity:'medium',title:'Avg. Position Needs Work',detail:`Position ${gsc.position} — many terms off page 1.`,action:'Review keywords'});
-  if(gsc&&gsc.ctr<2) a.push({severity:'medium',title:'Low CTR',detail:`${gsc.ctr}% CTR — meta titles need work.`,action:'Optimise meta'});
-  if(!a.length) a.push({severity:'info',title:'All Systems Good',detail:`${recent7} genuine leads in last 7 days.${gsc?` GSC: ${gsc.clicks} clicks at pos ${gsc.position}.`:''}`,action:'View full report'});
+  if(c.aeo<45) a.push({severity:'high',title:'AEO Low',detail:`Verified score ${c.aeo}/100. Tick missing boxes manually or run audit.`});
+  if(c.seo<60) a.push({severity:'high',title:'SEO Below 60',detail:'Confirm Meta + Technical + Backlinks + Keyword Map.'});
+  if(!flags.llmsTxtDone) a.push({severity:'medium',title:'llms.txt Unverified',detail:'Click checkbox if deployed.'});
+  if(!flags.faqSchemaDone) a.push({severity:'medium',title:'FAQ Schema Unverified',detail:'Click checkbox if implemented.'});
+  if(!flags.localSchemaDone) a.push({severity:'medium',title:'LocalBusiness Schema Unverified',detail:'Click checkbox if implemented.'});
+  if(gsc&&gsc.position>15) a.push({severity:'medium',title:'Position Needs Work',detail:`Pos ${gsc.position}.`});
+  if(gsc&&gsc.ctr<2) a.push({severity:'medium',title:'Low CTR',detail:`${gsc.ctr}% CTR.`});
+  if(!a.length) a.push({severity:'info',title:'All Good',detail:`${recent} leads in period.${gsc?` ${gsc.clicks} clicks, pos ${gsc.position}.`:''}`});
   return a;
 }
 
@@ -1371,12 +1241,11 @@ async function generateReport() {
   const clientId=document.getElementById('report-client').value;
   const period=document.getElementById('report-period').value;
   const type=document.getElementById('report-type').value;
-  if(!clientId){showToast('Please select a client first');return;}
+  if(!clientId){showToast('Select a client');return;}
   const c=CLIENTS.find(x=>x.id===clientId);
-  const outputEl=document.getElementById('report-output');
-  const actionsEl=document.getElementById('report-actions');
+  const outputEl=document.getElementById('report-output'); const actionsEl=document.getElementById('report-actions');
   outputEl.style.display='flex';outputEl.className='output-area loading';
-  outputEl.innerHTML='<div class="spinner"></div><span style="color:var(--muted)">Building report from live data...</span>';
+  outputEl.innerHTML='<div class="spinner"></div><span style="color:var(--muted)">Building...</span>';
   actionsEl.style.display='none';
   const days={'7d':7,'28d':28,'monthly':28,'quarterly':90}[period]||28;
   const cutoff=new Date();cutoff.setDate(cutoff.getDate()-days);
@@ -1394,72 +1263,32 @@ async function generateReport() {
   showToast('Report ready');
 }
 function buildStructuredReport(c,period,type,recentLeads,total,gsc){
-  const now=new Date();
-  const month=now.toLocaleString('default',{month:'long',year:'numeric'});
-  const header=`KCA SEO REPORT — ${c.name.toUpperCase()}\n${'='.repeat(60)}\nDomain: ${c.domain}  |  Location: ${c.location}\nPeriod: ${period}  |  Generated: ${month}\n${'='.repeat(60)}`;
+  const header=`KCA SEO REPORT — ${c.name.toUpperCase()}\n${'='.repeat(60)}\nDomain: ${c.domain}  |  Location: ${c.location}\nPeriod: ${period}\n${'='.repeat(60)}`;
   const flags=getEffectiveFlags(c.id);
   if(type==='summary'){
-    const gscLine=gsc?`Organic clicks: ${gsc.clicks.toLocaleString()}, avg position: ${gsc.position}, CTR: ${gsc.ctr}%, impressions: ${gsc.impressions.toLocaleString()}.`:'GSC data loading.';
-    const leadLine=`${recentLeads} genuine leads recorded in the period (${total} all time).`;
-    const scoreNote=`SEO score: ${c.seo}/100, AEO: ${c.aeo}/100, Local SEO: ${c.lseo}/100.`;
-    const trend=gsc&&gsc.position<=10?'Rankings strong, average position inside the top 10.':gsc&&gsc.position<=20?'Rankings building. Push top terms into the top 5.':'Avg position outside page 1. Priority: move core service terms onto page 1.';
-    return `${header}\n\nEXECUTIVE SUMMARY\n\n${gscLine} ${leadLine} ${scoreNote}\n\n${trend}`;
+    return `${header}\n\nEXECUTIVE SUMMARY\n\n${gsc?`Organic clicks: ${gsc.clicks.toLocaleString()}, pos ${gsc.position}, CTR ${gsc.ctr}%, impressions ${gsc.impressions.toLocaleString()}.`:'GSC loading.'} ${recentLeads} leads in period (${total} all time). SEO: ${c.seo}/100, AEO: ${c.aeo}/100, LSEO: ${c.lseo}/100. Scores reflect verified + manual reality only.`;
   }
   if(type==='gsc'){
-    const rows=gsc&&gsc.topQueries.length?gsc.topQueries.map((q,i)=>`  ${String(i+1).padStart(2)}. ${q.query.padEnd(45)} ${String(q.clicks).padStart(6)} clicks   pos ${String(q.position).padStart(5)}   CTR ${q.ctr}%`).join('\n'):'  No GSC data.';
-    return `${header}\n\nGSC PERFORMANCE — ${period}\n${'-'.repeat(60)}\n  Organic Clicks:  ${gsc?gsc.clicks.toLocaleString():'—'}\n  Impressions:     ${gsc?gsc.impressions.toLocaleString():'—'}\n  Avg. Position:   ${gsc?gsc.position:'—'}\n  CTR:             ${gsc?gsc.ctr+'%':'—'}\n\nTOP QUERIES\n${'-'.repeat(60)}\n${rows}`;
+    const rows=gsc&&gsc.topQueries.length?gsc.topQueries.map((q,i)=>`  ${i+1}. ${q.query.padEnd(40)} ${q.clicks} clicks  pos ${q.position}  CTR ${q.ctr}%`).join('\n'):'  No data.';
+    return `${header}\n\nGSC PERFORMANCE — ${period}\n${'-'.repeat(60)}\nClicks: ${gsc?gsc.clicks:'—'}\nImpressions: ${gsc?gsc.impressions:'—'}\nAvg Position: ${gsc?gsc.position:'—'}\nCTR: ${gsc?gsc.ctr+'%':'—'}\n\nTOP QUERIES\n${rows}`;
   }
   if(type==='gmb'){
-    return `${header}\n\nGOOGLE BUSINESS PROFILE — ${period}\n${'-'.repeat(60)}\n  GBP Status:      ${flags.gbpOptimised?'Optimised':'Needs work'}\n  GBP Posts:       ${flags.gbpPostsActive?'Active':'Not active'}\n  Citations:       ${flags.citationsComplete?'Complete':'In progress'}\n  Local Schema:    ${flags.localSchemaDone?'Implemented':'Pending'}\n  Review Velocity: ${flags.reviewVelocity?'Active':'Not started'}\n  Local SEO Score: ${c.lseo}/100`;
+    return `${header}\n\nGBP — ${period}\n${'-'.repeat(60)}\nGBP: ${flags.gbpOptimised?'Optimised':'Needs work'}\nPosts: ${flags.gbpPostsActive?'Active':'Inactive'}\nCitations: ${flags.citationsComplete?'Complete':'In progress'}\nSchema: ${flags.localSchemaDone?'Done':'Pending'}\nReviews: ${flags.reviewVelocity?'Active':'Not started'}\nLSEO Score: ${c.lseo}/100`;
   }
-  const gscSection=gsc?`  Organic Clicks:  ${gsc.clicks.toLocaleString()}\n  Impressions:     ${gsc.impressions.toLocaleString()}\n  Avg. Position:   ${gsc.position}\n  CTR:             ${gsc.ctr}%\n\n  Top Queries:\n${gsc.topQueries.slice(0,5).map(q=>`    "${q.query}"\n     Clicks: ${q.clicks}  |  Position: ${q.position}  |  CTR: ${q.ctr}%`).join('\n')}`:'  GSC data not loaded.';
-  const leadSection=`  Total Genuine Leads (all time): ${total}\n  Leads in Period:                ${recentLeads}\n  Spam and vendor submissions excluded.`;
-  const scoreSection=`  SEO Score:     ${c.seo}/100\n  AEO Score:     ${c.aeo}/100\n  Local SEO:     ${c.lseo}/100`;
-  const gbpSection=`  GBP Optimised:   ${flags.gbpOptimised?'Yes':'No'}\n  GBP Posts:       ${flags.gbpPostsActive?'Active':'Not active'}\n  Citations:       ${flags.citationsComplete?'Complete':'In progress'}\n  Local Schema:    ${flags.localSchemaDone?'Done':'Pending'}\n  Review Campaign: ${flags.reviewVelocity?'Active':'Not started'}`;
-  const semrush=`  On-Page / Meta:  ${flags.metaOptimised?'Optimised':'Needs work'}\n  Technical SEO:   ${flags.technicalClean?'Clean':'Issues'}\n  Backlink Audit:  ${flags.backlinksAudited?'Complete':'Pending'}\n  Keyword Map:     ${flags.keywordMapBuilt?'Built':'In progress'}\n  AEO Files:       ${flags.llmsTxtDone?'llms.txt live':'Pending'}\n  FAQ Schema:      ${flags.faqSchemaDone?'Implemented':'Pending'}`;
-  return `${header}\n\nSECTION 1: GOOGLE SEARCH CONSOLE\n${'-'.repeat(60)}\n${gscSection}\n\nSECTION 2: GOOGLE BUSINESS PROFILE\n${'-'.repeat(60)}\n${gbpSection}\n\nSECTION 3: SEMRUSH HEALTH SUMMARY\n${'-'.repeat(60)}\n${semrush}\n\nSECTION 4: LEAD TRACKING (LIVE)\n${'-'.repeat(60)}\n${leadSection}\n\nSECTION 5: SCORES\n${'-'.repeat(60)}\n${scoreSection}`;
+  return `${header}\n\nSECTION 1: GSC\n${gsc?`Clicks ${gsc.clicks}, Impr ${gsc.impressions}, Pos ${gsc.position}, CTR ${gsc.ctr}%`:'No data'}\n\nSECTION 2: GBP\nGBP: ${flags.gbpOptimised?'Yes':'No'} | Posts: ${flags.gbpPostsActive?'Active':'No'} | Citations: ${flags.citationsComplete?'Done':'No'}\n\nSECTION 3: HEALTH\nMeta: ${flags.metaOptimised?'Done':'No'} | Technical: ${flags.technicalClean?'Clean':'No'} | Backlinks: ${flags.backlinksAudited?'Done':'No'} | llms: ${flags.llmsTxtDone?'Live':'No'} | FAQ: ${flags.faqSchemaDone?'Done':'No'}\n\nSECTION 4: LEADS\nTotal ${total}, Period ${recentLeads}\n\nSECTION 5: SCORES\nSEO ${c.seo}/100 | AEO ${c.aeo}/100 | LSEO ${c.lseo}/100`;
 }
 function renderRecentReports(){
   const el=document.getElementById('recent-reports-list');
   if(!generatedReports.length){el.innerHTML='<div class="empty-state"><p>No reports yet.</p></div>';return;}
   el.innerHTML=generatedReports.map((r,i)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="previewReport(${i})"><div style="width:36px;height:36px;border-radius:8px;background:var(--accent-m);display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#818CF8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div style="flex:1"><div style="font-size:13px;font-weight:600">${r.client}</div><div style="font-size:11px;color:var(--dim)">${r.type} | ${r.period} | ${r.date}</div></div><span class="badge badge-green">Ready</span></div>`).join('');
 }
-function previewReport(i){
-  const r=generatedReports[i];
-  document.getElementById('report-output').style.display='block';
-  document.getElementById('report-output').className='output-area';
-  document.getElementById('report-output').innerHTML=r.text.replace(/\n/g,'<br>');
-  document.getElementById('report-actions').style.display='flex';
-}
-function copyReport(){navigator.clipboard.writeText(document.getElementById('report-output').innerText).then(()=>showToast('Report copied'));}
-function downloadReport(){
-  const text=document.getElementById('report-output').innerText;
-  const c=CLIENTS.find(x=>x.id===document.getElementById('report-client').value);
-  const name=c?c.name.replace(/\s+/g,'_'):'report';
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/plain'}));a.download=`KCA_SEO_${name}_${new Date().toISOString().slice(0,10)}.txt`;a.click();
-  showToast('Report downloaded');
-}
-function copyAllData(){
-  const cutoff=new Date();cutoff.setDate(cutoff.getDate()-7);
-  const rows=['Status,Client,Domain,Total Leads,7d Leads,GSC Clicks,Avg Position,CTR,SEO,AEO,LSEO'];
-  CLIENTS.forEach(c=>{
-    const r7=allLiveLeads.filter(l=>l.clientObj.id===c.id&&parseDateStr(l.date)>=cutoff).length;
-    const gsc=c.gscData;
-    const status=isPaused(c.id)?'PAUSED':'ACTIVE';
-    rows.push(`${status},${c.name},${c.domain},${c.liveLeads??'?'},${r7},${gsc?gsc.clicks:'N/A'},${gsc?gsc.position:'N/A'},${gsc?gsc.ctr+'%':'N/A'},${c.seo},${c.aeo},${c.lseo}`);
-  });
-  navigator.clipboard.writeText(rows.join('\n')).then(()=>showToast('CSV copied (active + paused)'));
-}
-function showToast(msg){
-  const el=document.getElementById('toast');
-  document.getElementById('toast-text').textContent=msg;
-  el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'),2800);
-}
+function previewReport(i){const r=generatedReports[i];document.getElementById('report-output').style.display='block';document.getElementById('report-output').className='output-area';document.getElementById('report-output').innerHTML=r.text.replace(/\n/g,'<br>');document.getElementById('report-actions').style.display='flex';}
+function copyReport(){navigator.clipboard.writeText(document.getElementById('report-output').innerText).then(()=>showToast('Copied'));}
+function downloadReport(){const text=document.getElementById('report-output').innerText;const c=CLIENTS.find(x=>x.id===document.getElementById('report-client').value);const name=c?c.name.replace(/\s+/g,'_'):'report';const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/plain'}));a.download=`KCA_SEO_${name}_${new Date().toISOString().slice(0,10)}.txt`;a.click();showToast('Downloaded');}
+function copyAllData(){const days=getLeadsRangeDays();const cutoff=new Date();cutoff.setDate(cutoff.getDate()-days);const rows=[`Status,Client,Domain,Total Leads,${days}d Leads,GSC Clicks,Avg Position,CTR,SEO,AEO,LSEO`];CLIENTS.forEach(c=>{const r=allLiveLeads.filter(l=>l.clientObj.id===c.id&&parseDateStr(l.date)>=cutoff).length;const gsc=c.gscData;const status=isPaused(c.id)?'PAUSED':'ACTIVE';rows.push(`${status},${c.name},${c.domain},${c.liveLeads??'?'},${r},${gsc?gsc.clicks:'N/A'},${gsc?gsc.position:'N/A'},${gsc?gsc.ctr+'%':'N/A'},${c.seo},${c.aeo},${c.lseo}`);});navigator.clipboard.writeText(rows.join('\n')).then(()=>showToast('CSV copied'));}
+function showToast(msg){const el=document.getElementById('toast');document.getElementById('toast-text').textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2800);}
 
-document.addEventListener('DOMContentLoaded',()=>{
-  const check=setInterval(()=>{if(window.google?.accounts?.oauth2){clearInterval(check);console.log('GIS ready');}},200);
-});
+document.addEventListener('DOMContentLoaded',()=>{const check=setInterval(()=>{if(window.google?.accounts?.oauth2){clearInterval(check);}},200);});
 </script>
 </body>
 </html>
