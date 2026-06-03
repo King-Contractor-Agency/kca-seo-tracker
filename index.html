@@ -5,214 +5,257 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>KCA SEO Tracker — Live Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800;900&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet" />
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
   <style>
-    :root{--bg:#06080A;--surface:#0D1117;--card:#13181F;--border:#1E2530;--border-soft:#252D3A;--text:#EDF0F4;--muted:#8B939E;--dim:#5A6270;--blue:#3B82F6;--green:#10B981;--yellow:#F59E0B;--red:#EF4444;--accent:#6366F1;--accent-h:#4F52DB;--accent-m:rgba(99,102,241,0.12);--gold:#F5A623;}
+    :root{
+      --bg:#050505;--surface:#0B0B0B;--card:#121212;--border:#1F1F1F;--border-soft:#2A2A2A;
+      --text:#FFFFFF;--muted:#B8B8B8;--dim:#6B6B6B;
+      --blue:#3B82F6;--green:#10B981;--yellow:#F5A623;--red:#E53935;
+      --accent:#F5A623;--accent-h:#D88E0F;--accent-m:rgba(245,166,35,0.12);
+      --gold:#F5A623;--gold-bright:#FFB627;--gold-dim:rgba(245,166,35,0.08);
+    }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html{-webkit-font-smoothing:antialiased}
-    body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-size:14px;line-height:1.5;min-height:100vh;display:flex}
-    #g-gate{position:fixed;inset:0;z-index:999;background:#06080A;display:flex;align-items:center;justify-content:center}
+    body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,sans-serif;font-size:14px;line-height:1.5;min-height:100vh;display:flex}
+
+    /* Gold accent band at the very top — KCA signature */
+    body::before{content:'';position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold) 0%,var(--gold-bright) 50%,var(--gold) 100%);z-index:1000;pointer-events:none}
+
+    /* Headings: bold, uppercase, condensed feel */
+    .display{font-family:'Oswald','Inter',sans-serif;font-weight:700;letter-spacing:0.02em;text-transform:uppercase}
+
+    /* ── Auth Gate ───────────────────────────────────── */
+    #g-gate{position:fixed;inset:0;z-index:999;background:#000;display:flex;align-items:center;justify-content:center}
     #g-gate.hidden{display:none}
-    .g-card{width:100%;max-width:400px;background:#0D1117;border:1px solid #1E2530;border-radius:16px;padding:40px 36px;box-shadow:0 24px 64px rgba(0,0,0,0.7);text-align:center}
-    .g-logo{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#6366F1,#4F46E5);box-shadow:0 4px 16px rgba(99,102,241,0.4);display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
-    .g-logo svg{width:24px;height:24px}
-    .g-title{font-size:22px;font-weight:800;margin-bottom:6px}
-    .g-title span{color:#6366F1}
-    .g-sub{font-size:13px;color:#8B939E;margin-bottom:28px;line-height:1.6}
-    .g-signin-btn{display:inline-flex;align-items:center;gap:10px;background:#fff;color:#1F2937;border:none;border-radius:10px;padding:12px 24px;font-size:14px;font-weight:700;font-family:'Sora',sans-serif;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,0.3);transition:all 0.15s}
-    .g-signin-btn:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,0,0,0.4)}
-    .g-signin-btn svg{width:20px;height:20px;flex-shrink:0}
-    .g-footer{margin-top:20px;font-size:11px;color:#5A6270}
-    .g-error{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:#FCA5A5;border-radius:8px;padding:10px 14px;font-size:12px;margin-top:16px;display:none}
+    .g-card{width:100%;max-width:420px;background:#0A0A0A;border:1px solid var(--gold);border-radius:4px;padding:40px 36px;box-shadow:0 0 0 1px rgba(245,166,35,0.15),0 24px 64px rgba(0,0,0,0.9);text-align:center;position:relative}
+    .g-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--gold)}
+    .g-logo{width:56px;height:56px;border-radius:4px;background:var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 4px 20px rgba(245,166,35,0.4)}
+    .g-logo svg{width:28px;height:28px;color:#000}
+    .g-title{font-family:'Oswald',sans-serif;font-size:28px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:8px}
+    .g-title span{color:var(--gold)}
+    .g-sub{font-size:12px;color:#A0A0A0;margin-bottom:28px;line-height:1.6;letter-spacing:0.02em}
+    .g-signin-btn{display:inline-flex;align-items:center;gap:10px;background:var(--gold);color:#000;border:none;border-radius:4px;padding:14px 28px;font-size:13px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.15s}
+    .g-signin-btn:hover{background:var(--gold-bright);transform:translateY(-1px)}
+    .g-signin-btn svg{width:18px;height:18px;flex-shrink:0}
+    .g-footer{margin-top:24px;font-size:10px;color:var(--dim);letter-spacing:0.1em;text-transform:uppercase}
+    .g-error{background:rgba(229,57,53,0.1);border-left:3px solid var(--red);color:#FCA5A5;border-radius:0;padding:10px 14px;font-size:12px;margin-top:16px;display:none;text-align:left}
     .g-error.show{display:block}
-    .sidebar{width:240px;min-width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;position:sticky;top:0;overflow-y:auto}
-    .sidebar-brand{padding:16px;border-bottom:1px solid var(--border)}
+
+    /* ── Sidebar ─────────────────────────────────────── */
+    .sidebar{width:240px;min-width:240px;background:#000;border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;position:sticky;top:0;overflow-y:auto}
+    .sidebar-brand{padding:18px 16px;border-bottom:2px solid var(--gold);background:linear-gradient(180deg,rgba(245,166,35,0.03),transparent)}
     .brand-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-    .brand-icon{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#6366F1,#4F46E5);box-shadow:0 2px 8px rgba(99,102,241,0.35);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    .brand-icon svg{width:14px;height:14px}
-    .brand-title{font-size:13px;font-weight:700;letter-spacing:-0.3px;line-height:1.2}
-    .brand-title .ai{color:var(--accent)}
-    .brand-sub{font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--dim);margin-top:2px}
+    .brand-icon{width:32px;height:32px;border-radius:4px;background:var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .brand-icon svg{width:16px;height:16px;color:#000}
+    .brand-title{font-family:'Oswald',sans-serif;font-size:15px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;line-height:1.1}
+    .brand-title .ai{color:var(--gold)}
+    .brand-sub{font-size:8px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--dim);margin-top:3px}
     .live-dot{margin-left:auto;position:relative;width:6px;height:6px}
-    .live-dot::before{content:'';position:absolute;inset:0;border-radius:50%;background:#4ade80;animation:ping 1.5s ease-in-out infinite}
-    .live-dot::after{content:'';position:absolute;inset:0;border-radius:50%;background:#4ade80}
+    .live-dot::before{content:'';position:absolute;inset:0;border-radius:50%;background:var(--gold);animation:ping 1.5s ease-in-out infinite}
+    .live-dot::after{content:'';position:absolute;inset:0;border-radius:50%;background:var(--gold)}
     @keyframes ping{0%,100%{opacity:.75;transform:scale(1)}50%{opacity:0;transform:scale(2.2)}}
-    .tool-chip{display:flex;align-items:center;gap:8px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:8px;padding:6px 10px}
-    .tool-chip svg{width:12px;height:12px;color:var(--accent)}
-    .tool-chip-name{font-size:11px;font-weight:700;line-height:1}
-    .tool-chip-name .dean{background:linear-gradient(135deg,#818CF8,#6366F1,#4F46E5);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-    .tool-chip-sub{font-size:9px;color:var(--dim);margin-top:2px}
-    .nav-section-label{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--dim);padding:0 12px;margin-bottom:6px;margin-top:16px}
+    .tool-chip{display:flex;align-items:center;gap:8px;background:rgba(245,166,35,0.06);border-left:2px solid var(--gold);border-radius:0;padding:8px 10px}
+    .tool-chip svg{width:13px;height:13px;color:var(--gold)}
+    .tool-chip-name{font-family:'Oswald',sans-serif;font-size:11px;font-weight:700;line-height:1;letter-spacing:0.06em;text-transform:uppercase}
+    .tool-chip-name .dean{color:var(--gold)}
+    .tool-chip-sub{font-size:9px;color:var(--dim);margin-top:2px;letter-spacing:0.04em}
+    .nav-section-label{font-size:10px;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;color:var(--dim);padding:0 12px;margin-bottom:8px;margin-top:18px}
     .sidebar-nav{flex:1;padding:12px}
-    .nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:all 0.15s;text-decoration:none;margin-bottom:2px}
-    .nav-item:hover{background:var(--card);color:var(--text)}
-    .nav-item.active{background:var(--accent-m);color:var(--text)}
-    .nav-item-icon{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.15s}
-    .nav-item.active .nav-item-icon{background:rgba(99,102,241,0.2)}
-    .nav-item:hover .nav-item-icon{background:var(--border)}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:0;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:all 0.12s;text-decoration:none;margin-bottom:2px;border-left:2px solid transparent;letter-spacing:0.02em}
+    .nav-item:hover{background:var(--card);color:var(--text);border-left-color:var(--border-soft)}
+    .nav-item.active{background:rgba(245,166,35,0.08);color:var(--text);border-left-color:var(--gold)}
+    .nav-item-icon{width:22px;height:22px;border-radius:0;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:color 0.15s}
+    .nav-item.active .nav-item-icon svg{color:var(--gold)}
     .nav-item-icon svg{width:14px;height:14px}
-    .nav-item.active .nav-item-icon svg{color:var(--accent)}
-    .nav-dot{margin-left:auto;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+    .nav-dot{margin-left:auto;width:5px;height:5px;border-radius:50%;background:var(--gold)}
     .sidebar-footer{padding:12px;border-top:1px solid var(--border)}
-    .platform-badge{background:linear-gradient(135deg,rgba(99,102,241,0.08),rgba(99,102,241,0.04));border:1px solid rgba(99,102,241,0.2);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px;margin-bottom:8px}
-    .pb-icon{width:20px;height:20px;border-radius:4px;background:rgba(99,102,241,0.2);display:flex;align-items:center;justify-content:center}
-    .pb-icon svg{width:12px;height:12px;color:#818CF8}
-    .pb-name{font-size:11px;font-weight:600;color:#818CF8}
-    .pb-sub{font-size:9px;color:var(--dim);margin-top:1px}
-    .pb-live{margin-left:auto;font-size:9px;font-weight:700;background:rgba(16,185,129,0.12);color:#34D399;border-radius:4px;padding:2px 6px}
+    .platform-badge{background:rgba(245,166,35,0.05);border:1px solid rgba(245,166,35,0.2);border-radius:4px;padding:9px 12px;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+    .pb-icon{width:22px;height:22px;border-radius:3px;background:var(--gold);display:flex;align-items:center;justify-content:center}
+    .pb-icon svg{width:12px;height:12px;color:#000}
+    .pb-name{font-family:'Oswald',sans-serif;font-size:11px;font-weight:700;color:var(--gold);letter-spacing:0.04em;text-transform:uppercase}
+    .pb-sub{font-size:9px;color:var(--dim);margin-top:2px;letter-spacing:0.04em}
+    .pb-live{margin-left:auto;font-size:9px;font-weight:800;background:var(--gold);color:#000;border-radius:0;padding:3px 7px;letter-spacing:0.1em;text-transform:uppercase}
+
+    /* ── Main ────────────────────────────────────────── */
     .main{flex:1;overflow-y:auto}
-    .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10}
-    .topbar-title{font-size:15px;font-weight:700;flex:1}
-    .topbar-title span{color:var(--accent)}
+    .topbar{background:#000;border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:3px;z-index:10}
+    .topbar-title{font-family:'Oswald',sans-serif;font-size:18px;font-weight:700;flex:1;letter-spacing:0.06em;text-transform:uppercase}
+    .topbar-title span{color:var(--gold)}
     .topbar-actions{display:flex;align-items:center;gap:8px}
-    .badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;border-radius:9999px;padding:3px 10px}
-    .badge-green{background:rgba(16,185,129,0.12);color:#34D399;border:1px solid rgba(16,185,129,0.2)}
-    .badge-amber{background:rgba(245,158,11,0.12);color:#FCD34D;border:1px solid rgba(245,158,11,0.2)}
-    .badge-red{background:rgba(239,68,68,0.12);color:#FCA5A5;border:1px solid rgba(239,68,68,0.2)}
-    .badge-gray{background:rgba(90,98,112,0.2);color:var(--muted);border:1px solid var(--border)}
-    .badge-live{background:rgba(16,185,129,0.15);color:#34D399;border:1px solid rgba(16,185,129,0.3);animation:pulseBadge 2s ease-in-out infinite}
-    @keyframes pulseBadge{0%,100%{opacity:1}50%{opacity:0.6}}
-    .btn{display:inline-flex;align-items:center;gap:6px;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all 0.15s}
-    .btn svg{width:14px;height:14px}
-    .btn-primary{background:var(--accent);color:#fff;box-shadow:0 1px 8px rgba(99,102,241,0.3)}
-    .btn-primary:hover{background:var(--accent-h);transform:translateY(-1px)}
-    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
-    .btn-ghost:hover{border-color:var(--border-soft);color:var(--text);background:var(--card)}
+    .badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:800;border-radius:2px;padding:4px 9px;letter-spacing:0.08em;text-transform:uppercase}
+    .badge-green{background:rgba(16,185,129,0.12);color:#34D399;border:1px solid rgba(16,185,129,0.3)}
+    .badge-amber{background:rgba(245,166,35,0.12);color:var(--gold);border:1px solid rgba(245,166,35,0.3)}
+    .badge-red{background:rgba(229,57,53,0.12);color:#FCA5A5;border:1px solid rgba(229,57,53,0.3)}
+    .badge-gray{background:rgba(90,98,112,0.18);color:var(--muted);border:1px solid var(--border)}
+    .badge-live{background:var(--gold);color:#000;border:1px solid var(--gold);animation:pulseBadge 2s ease-in-out infinite}
+    @keyframes pulseBadge{0%,100%{opacity:1}50%{opacity:0.7}}
+    .btn{display:inline-flex;align-items:center;gap:7px;border-radius:3px;padding:8px 16px;font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;border:none;transition:all 0.12s;font-family:'Inter',sans-serif}
+    .btn svg{width:13px;height:13px}
+    .btn-primary{background:var(--gold);color:#000}
+    .btn-primary:hover{background:var(--gold-bright);transform:translateY(-1px)}
+    .btn-ghost{background:transparent;border:1px solid var(--border-soft);color:var(--muted)}
+    .btn-ghost:hover{border-color:var(--gold);color:var(--gold);background:rgba(245,166,35,0.04)}
     .content{padding:24px}
-    .live-banner{background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(16,185,129,0.04));border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:10px 16px;display:flex;align-items:center;gap:10px;margin-bottom:20px;font-size:12px}
-    .live-banner-dot{width:8px;height:8px;border-radius:50%;background:#34D399;flex-shrink:0;animation:pulseBadge 1.5s ease-in-out infinite}
-    .live-banner-text{color:#34D399;font-weight:600}
-    .live-banner-sub{color:var(--muted);margin-left:4px}
-    .live-banner-time{margin-left:auto;font-size:11px;color:var(--dim);font-family:'JetBrains Mono',monospace}
-    .stat-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px}
-    .stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color 0.15s,transform 0.15s}
-    .stat-card:hover{border-color:var(--border-soft);transform:translateY(-1px)}
-    .stat-top{height:3px;width:100%}
+
+    /* ── Live banner ─────────────────────────────────── */
+    .live-banner{background:#0A0A0A;border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:2px;padding:11px 16px;display:flex;align-items:center;gap:10px;margin-bottom:24px;font-size:12px}
+    .live-banner-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;animation:pulseBadge 1.5s ease-in-out infinite}
+    .live-banner-text{color:var(--gold);font-weight:800;letter-spacing:0.1em;text-transform:uppercase;font-size:11px}
+    .live-banner-sub{color:var(--muted);margin-left:4px;letter-spacing:0.01em}
+    .live-banner-time{margin-left:auto;font-size:10px;color:var(--dim);font-family:'JetBrains Mono',monospace;letter-spacing:0.05em;text-transform:uppercase}
+
+    /* ── Stats ───────────────────────────────────────── */
+    .stat-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:24px}
+    .stat-card{background:#0A0A0A;border:1px solid var(--border);border-radius:3px;overflow:hidden;transition:border-color 0.15s,transform 0.15s;position:relative}
+    .stat-card:hover{border-color:var(--gold);transform:translateY(-2px)}
+    .stat-top{height:2px;width:100%}
     .stat-body{padding:14px 16px;position:relative}
-    .stat-label{font-size:10px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--dim);margin-bottom:6px;display:flex;align-items:center;gap:6px}
-    .stat-value{font-size:26px;font-weight:800;letter-spacing:-1px;line-height:1}
-    .stat-sub{font-size:11px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:4px}
+    .stat-label{font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+    .stat-value{font-family:'Oswald',sans-serif;font-size:30px;font-weight:700;letter-spacing:-0.02em;line-height:1}
+    .stat-sub{font-size:10px;color:var(--muted);margin-top:5px;display:flex;align-items:center;gap:4px;letter-spacing:0.02em}
     .trend-up{color:#34D399}.trend-down{color:#F87171}.trend-flat{color:var(--dim)}
     @keyframes shimmer{0%,100%{opacity:0.4}50%{opacity:0.7}}
     .stat-loading{opacity:0.4;animation:shimmer 1.5s ease-in-out infinite}
-    .leads-toggle{position:absolute;top:10px;right:10px;display:flex;gap:2px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:2px}
-    .leads-toggle button{background:transparent;border:none;color:var(--dim);font-size:9px;font-weight:700;padding:3px 7px;border-radius:4px;cursor:pointer;font-family:'Sora',sans-serif;transition:all 0.15s}
+    .leads-toggle{position:absolute;top:10px;right:10px;display:flex;gap:1px;background:#000;border:1px solid var(--border);border-radius:2px;padding:1px}
+    .leads-toggle button{background:transparent;border:none;color:var(--dim);font-size:9px;font-weight:800;padding:3px 7px;border-radius:0;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.12s;letter-spacing:0.05em}
     .leads-toggle button:hover{color:var(--muted)}
-    .leads-toggle button.active{background:var(--accent);color:#fff}
-    .section-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-    .section-title{font-size:13px;font-weight:700;letter-spacing:-0.2px}
+    .leads-toggle button.active{background:var(--gold);color:#000}
+
+    /* ── Section headers ─────────────────────────────── */
+    .section-header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+    .section-title{font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase}
     .section-line{flex:1;height:1px;background:var(--border)}
-    .section-action{font-size:11px;color:var(--accent);cursor:pointer;font-weight:600}
-    .client-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:24px}
-    .client-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;transition:all 0.15s}
-    .client-card:hover{border-color:var(--border-soft);box-shadow:0 4px 24px rgba(0,0,0,0.4)}
-    .client-card.selected{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 4px 24px rgba(99,102,241,0.15)}
+    .section-action{font-size:10px;color:var(--gold);cursor:pointer;font-weight:800;letter-spacing:0.08em;text-transform:uppercase}
+
+    /* ── Client grid ─────────────────────────────────── */
+    .client-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:24px}
+    .client-card{background:#0A0A0A;border:1px solid var(--border);border-radius:3px;padding:16px;cursor:pointer;transition:all 0.15s;position:relative}
+    .client-card::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px;background:transparent;transition:background 0.15s}
+    .client-card:hover{border-color:var(--border-soft);box-shadow:0 4px 24px rgba(0,0,0,0.6)}
+    .client-card:hover::before{background:var(--gold)}
+    .client-card.selected{border-color:var(--gold)}
+    .client-card.selected::before{background:var(--gold)}
     .client-card-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
-    .client-avatar{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0}
-    .client-name{font-size:13px;font-weight:700;line-height:1.2}
+    .client-avatar{width:38px;height:38px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0;letter-spacing:0.04em}
+    .client-name{font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;line-height:1.2;letter-spacing:0.02em;text-transform:uppercase}
     .client-domain{font-size:10px;color:var(--dim);margin-top:2px;font-family:'JetBrains Mono',monospace}
     .client-status{margin-left:auto}
-    .score-row{display:flex;gap:8px}
-    .score-pill{flex:1;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:6px 8px;text-align:center;position:relative}
-    .score-pill-label{font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--dim)}
-    .score-pill-val{font-size:17px;font-weight:800;line-height:1.2;margin-top:2px}
-    .score-pill.auditing::after{content:'';position:absolute;top:4px;right:4px;width:5px;height:5px;border-radius:50%;background:#FCD34D;animation:pulseBadge 1s ease-in-out infinite}
-    .client-metrics{display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+    .score-row{display:flex;gap:6px}
+    .score-pill{flex:1;background:#000;border:1px solid var(--border);border-radius:2px;padding:7px 8px;text-align:center;position:relative}
+    .score-pill-label{font-size:9px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--dim)}
+    .score-pill-val{font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;line-height:1.1;margin-top:2px;letter-spacing:-0.02em}
+    .score-pill.auditing::after{content:'';position:absolute;top:4px;right:4px;width:5px;height:5px;border-radius:50%;background:var(--gold);animation:pulseBadge 1s ease-in-out infinite}
+    .client-metrics{display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
     .client-metric{flex:1}
-    .cm-label{font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--dim)}
-    .cm-value{font-size:13px;font-weight:700;margin-top:2px;font-family:'JetBrains Mono',monospace}
-    .cm-trend{font-size:10px;margin-top:1px}
-    .leads-panel{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:24px}
-    .leads-panel-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-    .lead-row{display:flex;align-items:center;gap:12px;padding:10px 18px;border-bottom:1px solid var(--border);transition:background 0.1s}
+    .cm-label{font-size:9px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--dim)}
+    .cm-value{font-family:'Oswald',sans-serif;font-size:15px;font-weight:700;margin-top:2px;letter-spacing:-0.01em}
+    .cm-trend{font-size:9px;margin-top:1px;letter-spacing:0.04em}
+
+    /* ── Leads ───────────────────────────────────────── */
+    .leads-panel{background:#0A0A0A;border:1px solid var(--border);border-radius:3px;overflow:hidden;margin-bottom:24px}
+    .leads-panel-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:rgba(245,166,35,0.03)}
+    .lead-row{display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid var(--border);transition:background 0.1s}
     .lead-row:last-child{border-bottom:none}
-    .lead-row:hover{background:rgba(255,255,255,0.02)}
-    .lead-avatar{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
-    .lead-name{font-size:12px;font-weight:600}
+    .lead-row:hover{background:rgba(245,166,35,0.04)}
+    .lead-avatar{width:30px;height:30px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;letter-spacing:0.04em}
+    .lead-name{font-size:13px;font-weight:700}
     .lead-client{font-size:10px;color:var(--dim);margin-top:1px;font-family:'JetBrains Mono',monospace}
     .lead-phone{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;flex-shrink:0}
     .lead-msg{font-size:11px;color:var(--muted);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .lead-source{font-size:9px;font-weight:600;background:var(--accent-m);color:#A5B4FC;border-radius:4px;padding:2px 6px;flex-shrink:0}
+    .lead-source{font-size:9px;font-weight:800;background:var(--gold-dim);color:var(--gold);border-radius:0;padding:3px 6px;flex-shrink:0;letter-spacing:0.08em;text-transform:uppercase}
     .lead-date{font-size:10px;color:var(--dim);font-family:'JetBrains Mono',monospace;flex-shrink:0}
-    .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
-    .detail-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden}
-    .detail-card-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
-    .detail-card-header svg{width:14px;height:14px;color:var(--accent)}
-    .detail-card-title{font-size:12px;font-weight:700}
+
+    /* ── Detail ──────────────────────────────────────── */
+    .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+    .detail-card{background:#0A0A0A;border:1px solid var(--border);border-radius:3px;overflow:hidden}
+    .detail-card-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:rgba(245,166,35,0.02)}
+    .detail-card-header svg{width:14px;height:14px;color:var(--gold)}
+    .detail-card-title{font-family:'Oswald',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase}
     .detail-card-body{padding:14px 16px}
     .kw-table{width:100%;border-collapse:collapse}
-    .kw-table th{font-size:9px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--dim);padding:0 0 8px 0;text-align:left}
+    .kw-table th{font-size:9px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--dim);padding:0 0 8px 0;text-align:left}
     .kw-table th:not(:first-child){text-align:right}
-    .kw-table td{padding:6px 0;border-top:1px solid var(--border);font-size:12px}
+    .kw-table td{padding:7px 0;border-top:1px solid var(--border);font-size:12px}
     .kw-table td:not(:first-child){text-align:right;font-family:'JetBrains Mono',monospace;font-size:11px}
     .kw-query{color:var(--text);font-weight:500;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .pos-chip{display:inline-block;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace}
+    .pos-chip{display:inline-block;border-radius:2px;padding:2px 7px;font-size:10px;font-weight:800;font-family:'JetBrains Mono',monospace}
     .pos-1-3{background:rgba(16,185,129,0.15);color:#34D399}
-    .pos-4-10{background:rgba(245,158,11,0.15);color:#FCD34D}
-    .pos-11-20{background:rgba(239,68,68,0.15);color:#FCA5A5}
+    .pos-4-10{background:rgba(245,166,35,0.15);color:var(--gold)}
+    .pos-11-20{background:rgba(229,57,53,0.15);color:#FCA5A5}
     .pos-rest{background:rgba(90,98,112,0.15);color:var(--muted)}
     .alert-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
     .alert-item:last-child{border-bottom:none;padding-bottom:0}
     .alert-icon{flex-shrink:0;margin-top:1px}
-    .alert-title{font-size:12px;font-weight:600}
+    .alert-title{font-size:12px;font-weight:700;letter-spacing:0.02em}
     .alert-detail{font-size:11px;color:var(--muted);margin-top:2px}
-    .alert-action{font-size:10px;color:var(--accent);font-weight:600;margin-top:4px;cursor:pointer}
+    .alert-action{font-size:10px;color:var(--gold);font-weight:800;margin-top:4px;cursor:pointer;letter-spacing:0.08em;text-transform:uppercase}
+
+    /* ── Factor panel ────────────────────────────────── */
     .factor-section{margin-bottom:14px}
     .factor-section:last-child{margin-bottom:0}
-    .factor-section-title{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--dim);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
-    .factor-section-title-score{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--text)}
-    .factor-row{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:12px}
-    .factor-check{width:18px;height:18px;border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:all 0.15s}
-    .factor-check.on{background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.4);color:#34D399}
-    .factor-check.off{background:var(--surface);border:1px solid var(--border);color:var(--dim)}
-    .factor-check:hover{border-color:var(--accent);transform:scale(1.08)}
+    .factor-section-title{display:flex;align-items:center;gap:6px;font-family:'Oswald',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--dim);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+    .factor-section-title-score{margin-left:auto;font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;color:var(--text);letter-spacing:0.02em}
+    .factor-row{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:12px}
+    .factor-check{width:20px;height:20px;border-radius:2px;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:all 0.15s}
+    .factor-check.on{background:var(--gold);border:1px solid var(--gold);color:#000}
+    .factor-check.off{background:#000;border:1px solid var(--border-soft);color:var(--dim)}
+    .factor-check:hover{border-color:var(--gold);transform:scale(1.08)}
     .factor-check.locked{cursor:default;opacity:0.85}
     .factor-check.locked:hover{transform:none}
-    .factor-check svg{width:11px;height:11px}
+    .factor-check svg{width:12px;height:12px}
     .factor-label{flex:1;color:var(--text);font-weight:500;cursor:pointer}
     .factor-pts{font-size:10px;color:var(--dim);font-family:'JetBrains Mono',monospace;margin-right:4px}
-    .factor-tag{font-size:8px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;border-radius:4px;padding:2px 6px;flex-shrink:0}
+    .factor-tag{font-size:8px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;border-radius:2px;padding:3px 7px;flex-shrink:0}
     .factor-tag.live{background:rgba(16,185,129,0.12);color:#34D399}
-    .factor-tag.manual{background:rgba(99,102,241,0.18);color:#A5B4FC;font-weight:800}
-    .factor-tag.gsc{background:rgba(245,158,11,0.12);color:#FCD34D}
+    .factor-tag.manual{background:var(--gold);color:#000}
+    .factor-tag.gsc{background:rgba(245,166,35,0.15);color:var(--gold);border:1px solid rgba(245,166,35,0.25)}
     .factor-tag.unverified{background:rgba(90,98,112,0.18);color:var(--dim)}
-    .factor-tag.auditing{background:rgba(252,211,77,0.12);color:#FCD34D;animation:pulseBadge 1s ease-in-out infinite}
-    .chart-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px}
-    .chart-card-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-    .chart-card-title{font-size:12px;font-weight:700}
+    .factor-tag.auditing{background:rgba(245,166,35,0.12);color:var(--gold);animation:pulseBadge 1s ease-in-out infinite}
+
+    /* ── Charts ──────────────────────────────────────── */
+    .chart-card{background:#0A0A0A;border:1px solid var(--border);border-radius:3px;overflow:hidden;margin-bottom:14px}
+    .chart-card-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:rgba(245,166,35,0.02)}
+    .chart-card-title{font-family:'Oswald',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase}
     .chart-card-body{padding:16px;position:relative}
-    .chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
-    .range-selector{display:flex;gap:4px;margin-left:auto;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:3px}
-    .range-btn{padding:4px 10px;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;color:var(--dim);border:none;background:transparent;transition:all 0.15s;font-family:'Sora',sans-serif}
-    .range-btn:hover{color:var(--muted);background:var(--card)}
-    .range-btn.active{background:var(--accent);color:#fff;box-shadow:0 1px 6px rgba(99,102,241,0.3)}
-    .report-gen{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:24px}
-    .report-gen-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-    .report-gen-title{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
-    .report-gen-title svg{width:15px;height:15px;color:var(--gold)}
+    .chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+    .range-selector{display:flex;gap:1px;margin-left:auto;background:#000;border:1px solid var(--border);border-radius:2px;padding:1px}
+    .range-btn{padding:5px 10px;border-radius:0;font-size:10px;font-weight:800;cursor:pointer;color:var(--dim);border:none;background:transparent;transition:all 0.12s;font-family:'Inter',sans-serif;letter-spacing:0.06em}
+    .range-btn:hover{color:var(--muted)}
+    .range-btn.active{background:var(--gold);color:#000}
+
+    /* ── Reports ─────────────────────────────────────── */
+    .report-gen{background:#0A0A0A;border:1px solid var(--border);border-radius:3px;overflow:hidden;margin-bottom:24px}
+    .report-gen-header{padding:14px 18px;border-bottom:2px solid var(--gold);display:flex;align-items:center;justify-content:space-between;background:rgba(245,166,35,0.03)}
+    .report-gen-title{font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+    .report-gen-title svg{width:16px;height:16px;color:var(--gold)}
     .report-gen-body{padding:18px}
     .report-form{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end}
-    .form-group label{display:block;font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
-    .form-group select,.form-group input{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 12px;font-size:13px;font-family:'Sora',sans-serif;outline:none;transition:border-color 0.15s}
-    .form-group select:focus,.form-group input:focus{border-color:var(--accent)}
-    .output-area{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-top:16px;min-height:100px;font-size:13px;color:var(--muted);white-space:pre-wrap}
+    .form-group label{display:block;font-size:9px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+    .form-group select,.form-group input{width:100%;background:#000;border:1px solid var(--border);color:var(--text);border-radius:2px;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;outline:none;transition:border-color 0.15s}
+    .form-group select:focus,.form-group input:focus{border-color:var(--gold)}
+    .output-area{background:#000;border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:2px;padding:18px;margin-top:16px;min-height:100px;font-size:12px;color:var(--muted);white-space:pre-wrap;font-family:'JetBrains Mono',monospace;line-height:1.7}
     .output-area.loading{display:flex;align-items:center;justify-content:center;gap:8px}
-    .spinner{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);border-top-color:var(--accent);animation:spin 0.7s linear infinite}
+    .spinner{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);border-top-color:var(--gold);animation:spin 0.7s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
-    .tab-strip{display:flex;gap:4px;margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:4px;flex-wrap:wrap}
-    .tab{flex:1;min-width:52px;padding:8px 8px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;text-align:center;transition:all 0.15s;color:var(--dim)}
+
+    /* ── Tabs ────────────────────────────────────────── */
+    .tab-strip{display:flex;gap:2px;margin-bottom:20px;background:#000;border:1px solid var(--border);border-radius:2px;padding:3px;flex-wrap:wrap}
+    .tab{flex:1;min-width:54px;padding:9px 8px;border-radius:0;font-size:11px;font-weight:800;cursor:pointer;text-align:center;transition:all 0.15s;color:var(--dim);letter-spacing:0.06em;text-transform:uppercase;font-family:'Inter',sans-serif}
     .tab:hover{color:var(--muted);background:var(--card)}
-    .tab.active{background:var(--accent);color:#fff;box-shadow:0 1px 8px rgba(99,102,241,0.3)}
-    .toast{position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500;box-shadow:0 8px 32px rgba(0,0,0,0.5);z-index:100;opacity:0;transform:translateY(8px);transition:all 0.3s;pointer-events:none}
+    .tab.active{background:var(--gold);color:#000}
+
+    /* ── Toast ───────────────────────────────────────── */
+    .toast{position:fixed;bottom:24px;right:24px;background:#000;border:1px solid var(--gold);border-left:4px solid var(--gold);border-radius:0;padding:12px 18px;display:flex;align-items:center;gap:10px;font-size:12px;font-weight:700;box-shadow:0 8px 32px rgba(0,0,0,0.7);z-index:100;opacity:0;transform:translateY(8px);transition:all 0.3s;pointer-events:none;letter-spacing:0.04em}
     .toast.show{opacity:1;transform:translateY(0)}
-    .toast svg{width:16px;height:16px;color:#34D399}
+    .toast svg{width:16px;height:16px;color:var(--gold)}
     .empty-state{text-align:center;padding:32px;color:var(--dim)}
     .empty-state svg{width:32px;height:32px;margin:0 auto 10px;display:block;opacity:0.4}
     .empty-state p{font-size:13px}
-    .no-data-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:160px;color:var(--dim);font-size:12px;gap:8px}
+    .no-data-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:160px;color:var(--dim);font-size:11px;gap:8px;letter-spacing:0.04em;text-transform:uppercase;font-weight:700}
     .no-data-state svg{width:28px;height:28px;opacity:0.3}
+
     @media(max-width:1100px){.client-grid{grid-template-columns:1fr}.stat-strip{grid-template-columns:repeat(3,1fr)}.detail-grid{grid-template-columns:1fr}.report-form{grid-template-columns:1fr 1fr}.chart-grid{grid-template-columns:1fr}}
     @media(max-width:768px){.sidebar{display:none}.stat-strip{grid-template-columns:repeat(2,1fr)}}
   </style>
@@ -221,9 +264,9 @@
 
 <div id="g-gate">
   <div class="g-card">
-    <div class="g-logo"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div>
-    <div class="g-title">KCA <span>AI OS</span></div>
-    <div class="g-sub">Sign in with your <strong style="color:#818CF8">@kingcontractor.com</strong> Google account to access live SEO data.</div>
+    <div class="g-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div>
+    <div class="g-title">KCA <span>SEO TRACKER</span></div>
+    <div class="g-sub">Sign in with your <strong style="color:var(--gold)">@kingcontractor.com</strong> Google account to access live SEO data.</div>
     <button class="g-signin-btn" onclick="startGoogleSignIn()"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>Sign in with Google</button>
     <div class="g-error" id="g-error"></div>
     <div class="g-footer">King Contractor Agency · @kingcontractor.com only</div>
@@ -232,62 +275,62 @@
 
 <aside class="sidebar">
   <div class="sidebar-brand">
-    <div class="brand-row"><div class="brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div><div><div class="brand-title">KCA <span class="ai">AI OS</span></div><div class="brand-sub">Intelligence Platform</div></div><div class="live-dot"></div></div>
-    <div class="tool-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><div><div class="tool-chip-name"><span class="dean">SEO</span> TRACKER</div><div class="tool-chip-sub">Live GSC + Sheets + Docs</div></div></div>
+    <div class="brand-row"><div class="brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div><div><div class="brand-title">KCA <span class="ai">SEO</span></div><div class="brand-sub">King Contractor Agency</div></div><div class="live-dot"></div></div>
+    <div class="tool-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><div><div class="tool-chip-name"><span class="dean">LIVE</span> TRACKER</div><div class="tool-chip-sub">GSC + Sheets + Docs</div></div></div>
   </div>
   <nav class="sidebar-nav">
     <div class="nav-section-label">Views</div>
-    <a class="nav-item active" onclick="switchView('overview')"><div class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>Portfolio Overview<div class="nav-dot"></div></a>
-    <a class="nav-item" onclick="switchView('leads')"><div class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>Live Leads Feed</a>
+    <a class="nav-item active" onclick="switchView('overview')"><div class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>Portfolio<div class="nav-dot"></div></a>
+    <a class="nav-item" onclick="switchView('leads')"><div class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>Leads Feed</a>
     <a class="nav-item" onclick="switchView('tracking')"><div class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>Client Detail</a>
-    <a class="nav-item" onclick="switchView('reports')"><div class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>Report Generator</a>
-    <a class="nav-item" onclick="switchView('paused')"><div class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg></div>Paused Clients<span id="paused-count-badge" class="badge badge-gray" style="margin-left:auto;font-size:9px;padding:1px 6px">0</span></a>
+    <a class="nav-item" onclick="switchView('reports')"><div class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>Reports</a>
+    <a class="nav-item" onclick="switchView('paused')"><div class="nav-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg></div>Paused<span id="paused-count-badge" class="badge badge-gray" style="margin-left:auto;font-size:9px;padding:2px 6px">0</span></a>
     <div class="nav-section-label">Active Clients</div>
     <div id="client-nav-list"></div>
   </nav>
   <div class="sidebar-footer">
-    <div class="platform-badge"><div class="pb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div><div><div class="pb-name">King Contractor AI</div><div class="pb-sub">10 sites · OAuth Live</div></div><div class="pb-live">LIVE</div></div>
-    <button class="btn btn-ghost" style="width:100%;justify-content:center;font-size:12px;margin-bottom:8px;" onclick="copyAllData()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Export CSV</button>
-    <div id="user-chip" style="display:flex;align-items:center;gap:8px;background:var(--card);border-radius:8px;padding:8px 10px;margin-bottom:6px;"><img id="user-avatar-img" style="width:24px;height:24px;border-radius:50%;flex-shrink:0;display:none" /><div id="user-avatar-fb" style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#4F46E5);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0">K</div><div style="font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1" id="user-email-label">Signing in...</div></div>
-    <button class="btn btn-ghost" style="width:100%;justify-content:center;font-size:12px;" onclick="signOut()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</button>
+    <div class="platform-badge"><div class="pb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div><div><div class="pb-name">King Contractor</div><div class="pb-sub">10 sites · OAuth Live</div></div><div class="pb-live">Live</div></div>
+    <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-bottom:8px;" onclick="copyAllData()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Export CSV</button>
+    <div id="user-chip" style="display:flex;align-items:center;gap:8px;background:#000;border:1px solid var(--border);border-radius:2px;padding:8px 10px;margin-bottom:6px;"><img id="user-avatar-img" style="width:24px;height:24px;border-radius:2px;flex-shrink:0;display:none" /><div id="user-avatar-fb" style="width:24px;height:24px;border-radius:2px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#000;flex-shrink:0">K</div><div style="font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1" id="user-email-label">Signing in...</div></div>
+    <button class="btn btn-ghost" style="width:100%;justify-content:center;" onclick="signOut()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</button>
   </div>
 </aside>
 
 <main class="main">
   <div class="topbar">
-    <div class="topbar-title">SEO <span>Live Tracker</span></div>
+    <div class="topbar-title">KCA SEO <span>TRACKER</span></div>
     <div class="topbar-actions">
-      <span class="badge badge-live" id="last-updated-badge"><svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3" fill="currentColor"/></svg>Loading...</span>
+      <span class="badge badge-live" id="last-updated-badge"><svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3" fill="currentColor"/></svg>Loading</span>
       <button class="btn btn-ghost" onclick="refreshAll()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Refresh</button>
-      <button class="btn btn-primary" onclick="switchView('reports')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Generate Report</button>
+      <button class="btn btn-primary" onclick="switchView('reports')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Generate Report</button>
     </div>
   </div>
 
   <div class="content">
     <div id="view-overview">
-      <div class="live-banner"><div class="live-banner-dot"></div><span class="live-banner-text">LIVE DATA</span><span class="live-banner-sub">Sheets leads + GSC + logbook + mastersheet + website crawl. Manual ticks always win and survive re-audits.</span><span class="live-banner-time" id="sheet-sync-time">Syncing...</span></div>
+      <div class="live-banner"><div class="live-banner-dot"></div><span class="live-banner-text">LIVE DATA</span><span class="live-banner-sub">Sheets leads + GSC + logbook + mastersheet + website crawl. Manual ticks always win.</span><span class="live-banner-time" id="sheet-sync-time">Syncing...</span></div>
       <div class="stat-strip" id="stat-strip"></div>
-      <div class="section-header"><div class="section-title">Client Portfolio</div><div class="section-line"></div><div class="section-action" onclick="switchView('leads')">View Live Leads Feed →</div></div>
+      <div class="section-header"><div class="section-title">Client Portfolio</div><div class="section-line"></div><div class="section-action" onclick="switchView('leads')">Live Leads Feed →</div></div>
       <div class="client-grid" id="client-grid"></div>
     </div>
 
     <div id="view-leads" style="display:none">
       <div class="live-banner"><div class="live-banner-dot"></div><span class="live-banner-text">LIVE LEADS</span><span class="live-banner-sub">Real form submissions via Google OAuth. Spam and vendors excluded.</span><span class="live-banner-time" id="leads-sync-time">Syncing...</span></div>
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:16px;flex-wrap:wrap;">
-        <span style="font-size:12px;color:var(--dim);font-weight:600;">Filter:</span>
-        <button class="tab active" style="flex:none;padding:5px 12px" onclick="filterLeads('all',this)">All</button>
-        <button class="tab" style="flex:none;padding:5px 12px" onclick="filterLeads('horvath-roofing',this)">Horvath</button>
-        <button class="tab" style="flex:none;padding:5px 12px" onclick="filterLeads('spennato-roofing',this)">Spennato</button>
-        <button class="tab" style="flex:none;padding:5px 12px" onclick="filterLeads('link-exteriors',this)">Link Ext.</button>
-        <button class="tab" style="flex:none;padding:5px 12px" onclick="filterLeads('5star-roofing',this)">5 Star</button>
-        <button class="tab" style="flex:none;padding:5px 12px" onclick="filterLeads('highpoint-construction',this)">Highpoint</button>
-        <button class="tab" style="flex:none;padding:5px 12px" onclick="filterLeads('colorado-preferred-roofing',this)">Colorado</button>
-        <button class="tab" style="flex:none;padding:5px 12px" onclick="filterLeads('all-heights-roofing',this)">All Heights</button>
-        <button class="tab" style="flex:none;padding:5px 12px" onclick="filterLeads('shingle-hut',this)">Shingle Hut</button>
-        <button class="tab" style="flex:none;padding:5px 12px" onclick="filterLeads('conway-roofing',this)">Conway</button>
+        <span style="font-size:11px;color:var(--dim);font-weight:800;letter-spacing:0.1em;text-transform:uppercase;">Filter:</span>
+        <button class="tab active" style="flex:none;padding:6px 12px" onclick="filterLeads('all',this)">All</button>
+        <button class="tab" style="flex:none;padding:6px 12px" onclick="filterLeads('horvath-roofing',this)">Horvath</button>
+        <button class="tab" style="flex:none;padding:6px 12px" onclick="filterLeads('spennato-roofing',this)">Spennato</button>
+        <button class="tab" style="flex:none;padding:6px 12px" onclick="filterLeads('link-exteriors',this)">Link Ext.</button>
+        <button class="tab" style="flex:none;padding:6px 12px" onclick="filterLeads('5star-roofing',this)">5 Star</button>
+        <button class="tab" style="flex:none;padding:6px 12px" onclick="filterLeads('highpoint-construction',this)">Highpoint</button>
+        <button class="tab" style="flex:none;padding:6px 12px" onclick="filterLeads('colorado-preferred-roofing',this)">Colorado</button>
+        <button class="tab" style="flex:none;padding:6px 12px" onclick="filterLeads('all-heights-roofing',this)">All Heights</button>
+        <button class="tab" style="flex:none;padding:6px 12px" onclick="filterLeads('shingle-hut',this)">Shingle Hut</button>
+        <button class="tab" style="flex:none;padding:6px 12px" onclick="filterLeads('conway-roofing',this)">Conway</button>
       </div>
       <div class="leads-panel">
-        <div class="leads-panel-header"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span style="font-size:13px;font-weight:700;">Genuine Leads — Live from Sheets</span><span class="badge badge-live" id="lead-count-badge" style="margin-left:auto">Loading...</span></div>
+        <div class="leads-panel-header"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span style="font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">Genuine Leads — Live from Sheets</span><span class="badge badge-live" id="lead-count-badge" style="margin-left:auto">Loading</span></div>
         <div id="leads-feed-body"><div class="empty-state"><div class="spinner" style="margin:0 auto"></div><p style="margin-top:10px">Loading leads via Google OAuth...</p></div></div>
       </div>
     </div>
@@ -298,20 +341,20 @@
     </div>
 
     <div id="view-paused" style="display:none">
-      <div class="live-banner" style="background:linear-gradient(135deg,rgba(90,98,112,0.12),rgba(90,98,112,0.04));border-color:var(--border-soft)"><div class="live-banner-dot" style="background:var(--dim);animation:none"></div><span class="live-banner-text" style="color:var(--muted)">PAUSED</span><span class="live-banner-sub">Excluded from active tracking. Resume to bring back.</span></div>
-      <div class="section-header"><div class="section-title">Off-Contract / Paused Clients</div><div class="section-line"></div><span class="badge badge-gray" id="paused-count-header">0 paused</span></div>
+      <div class="live-banner" style="background:#0A0A0A;border-left-color:var(--dim)"><div class="live-banner-dot" style="background:var(--dim);animation:none"></div><span class="live-banner-text" style="color:var(--muted)">PAUSED</span><span class="live-banner-sub">Excluded from active tracking. Resume to bring back.</span></div>
+      <div class="section-header"><div class="section-title">Off-Contract / Paused</div><div class="section-line"></div><span class="badge badge-gray" id="paused-count-header">0 paused</span></div>
       <div class="client-grid" id="paused-list"></div>
     </div>
 
     <div id="view-reports" style="display:none">
       <div class="report-gen">
-        <div class="report-gen-header"><div class="report-gen-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>KCA Monthly SEO Report Generator</div><span class="badge badge-live">Live GSC + Sheets + Docs</span></div>
+        <div class="report-gen-header"><div class="report-gen-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Monthly SEO Report Generator</div><span class="badge badge-live">Live</span></div>
         <div class="report-gen-body">
           <div class="report-form">
             <div class="form-group"><label>Client</label><select id="report-client"><option value="">Select client...</option></select></div>
             <div class="form-group"><label>Period</label><select id="report-period"><option value="7d">Last 7 Days</option><option value="28d" selected>Last 28 Days</option><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option></select></div>
             <div class="form-group"><label>Type</label><select id="report-type"><option value="full">Full 5-Section</option><option value="gsc">GSC Only</option><option value="gmb">GBP Only</option><option value="summary">Executive Summary</option></select></div>
-            <div><button class="btn btn-primary" onclick="generateReport()" style="width:100%;justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Generate</button></div>
+            <div><button class="btn btn-primary" onclick="generateReport()" style="width:100%;justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Generate</button></div>
           </div>
           <div id="report-output" class="output-area" style="display:none;color:var(--text)"></div>
           <div id="report-actions" style="display:none;margin-top:12px;gap:8px;flex-wrap:wrap;">
@@ -320,13 +363,13 @@
           </div>
         </div>
       </div>
-      <div class="section-header"><div class="section-title">Recent Reports</div><div class="section-line"></div><span class="badge badge-gray">Agency use only</span></div>
+      <div class="section-header"><div class="section-title">Recent Reports</div><div class="section-line"></div><span class="badge badge-gray">Agency Only</span></div>
       <div id="recent-reports-list"><div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><p>No reports generated yet.</p></div></div>
     </div>
   </div>
 </main>
 
-<div class="toast" id="toast"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span id="toast-text">Done!</span></div>
+<div class="toast" id="toast"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span id="toast-text">Done!</span></div>
 
 <script>
 // ════════════════════════════════════════════════════
@@ -336,7 +379,7 @@ const OAUTH_CLIENT_ID = '534572694815-ng35ie30ffhoukl0ont4evomi9j5ntc7.apps.goog
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly','https://www.googleapis.com/auth/webmasters.readonly','https://www.googleapis.com/auth/documents.readonly','email','profile'].join(' ');
 const DEFAULT_PAUSED = ['5star-roofing'];
 const AUDIT_TTL_MS = 6 * 60 * 60 * 1000;
-const AUDIT_CACHE_VERSION = 'v3-2026-06';   // bump invalidates stale caches with old shape
+const AUDIT_CACHE_VERSION = 'v3-2026-06';
 
 const FETCH_BACKENDS = [
   { name:'same-origin', url: t => '/api/fetch?url=' + encodeURIComponent(t), headers: null,
@@ -351,10 +394,6 @@ const FETCH_BACKENDS = [
 
 const chartRanges = {};
 
-// ════════════════════════════════════════════════════
-// FACTORS — pure schema. NO placeholder profiles. Scores reflect verified
-// reality only: web audit, logbook detection, or your manual click.
-// ════════════════════════════════════════════════════
 const FACTORS = {
   metaOptimised:    { cat:'SEO',  pts:25, label:'Meta Title + Description Optimised', desc:'Title 25-65 chars + meta description 100-170 chars on homepage' },
   technicalClean:   { cat:'SEO',  pts:20, label:'Technical Foundation Clean',         desc:'robots.txt + sitemap.xml both reachable' },
@@ -372,22 +411,11 @@ const FACTORS = {
   reviewVelocity:   { cat:'LSEO', pts:10, label:'Review Velocity Active',             desc:'Review request campaign running' },
 };
 
-// ════════════════════════════════════════════════════
-// PAUSE STATE
-// ════════════════════════════════════════════════════
 function ensureDefaultPausedSeeded() { if (localStorage.getItem('kca-paused-clients') === null) localStorage.setItem('kca-paused-clients', JSON.stringify(DEFAULT_PAUSED)); }
 function getPausedClients() { try { return JSON.parse(localStorage.getItem('kca-paused-clients')) || []; } catch { return []; } }
 function isPaused(clientId) { return getPausedClients().includes(clientId); }
-function pauseClient(clientId) {
-  const paused = getPausedClients();
-  if (!paused.includes(clientId)) { paused.push(clientId); localStorage.setItem('kca-paused-clients', JSON.stringify(paused)); }
-  rebuildAllViews(); showToast('Client paused');
-}
-function unpauseClient(clientId) {
-  const paused = getPausedClients().filter(id => id !== clientId);
-  localStorage.setItem('kca-paused-clients', JSON.stringify(paused));
-  rebuildAllViews(); showToast('Client resumed');
-}
+function pauseClient(clientId) { const p = getPausedClients(); if (!p.includes(clientId)) { p.push(clientId); localStorage.setItem('kca-paused-clients', JSON.stringify(p)); } rebuildAllViews(); showToast('Client paused'); }
+function unpauseClient(clientId) { const p = getPausedClients().filter(id => id !== clientId); localStorage.setItem('kca-paused-clients', JSON.stringify(p)); rebuildAllViews(); showToast('Client resumed'); }
 function getActiveClients() { return CLIENTS.filter(c => !isPaused(c.id)); }
 function rebuildAllViews() {
   buildClientNav(); buildClientTabs(); buildClientGrid(); buildStatStrip(); buildReportClientDropdown(); updatePausedCount();
@@ -396,39 +424,21 @@ function rebuildAllViews() {
   if (currentView === 'leads') renderLeadsFeed();
 }
 
-// ════════════════════════════════════════════════════
-// LOCAL STORAGE
-// ════════════════════════════════════════════════════
 function getManualFlags(clientId) { try { return JSON.parse(localStorage.getItem('kca-flags-' + clientId)) || {}; } catch { return {}; } }
 function setManualFlag(clientId, flag, value) { const f = getManualFlags(clientId); f[flag] = value; localStorage.setItem('kca-flags-' + clientId, JSON.stringify(f)); }
 function getAuditCache(clientId) {
-  try {
-    const cached = JSON.parse(localStorage.getItem('kca-audit-' + clientId));
-    if (!cached || cached.version !== AUDIT_CACHE_VERSION) return null;
-    return cached;
-  } catch { return null; }
+  try { const c = JSON.parse(localStorage.getItem('kca-audit-' + clientId)); if (!c || c.version !== AUDIT_CACHE_VERSION) return null; return c; } catch { return null; }
 }
-function setAuditCache(clientId, data) {
-  localStorage.setItem('kca-audit-' + clientId, JSON.stringify({ version: AUDIT_CACHE_VERSION, timestamp: Date.now(), data }));
-}
+function setAuditCache(clientId, data) { localStorage.setItem('kca-audit-' + clientId, JSON.stringify({ version: AUDIT_CACHE_VERSION, timestamp: Date.now(), data })); }
 function clearAuditCache(clientId) { localStorage.removeItem('kca-audit-' + clientId); }
-
-// Leads range — toggleable between 7/30/90 days, persisted
 function getLeadsRangeDays() { return parseInt(localStorage.getItem('kca-leads-range') || '7', 10); }
-function setLeadsRangeDays(days) {
-  localStorage.setItem('kca-leads-range', String(days));
-  buildStatStrip(); buildClientGrid();
-  if (currentView === 'tracking') renderTrackingDetail();
-}
+function setLeadsRangeDays(days) { localStorage.setItem('kca-leads-range', String(days)); buildStatStrip(); buildClientGrid(); if (currentView === 'tracking') renderTrackingDetail(); }
 
-// ════════════════════════════════════════════════════
-// GOOGLE DOCS
-// ════════════════════════════════════════════════════
 async function fetchGoogleDoc(docId) {
   if (!docId || !googleAccessToken) return { ok:false, status:0, doc:null };
   try {
     const res = await fetch('https://docs.googleapis.com/v1/documents/' + docId, { headers: { Authorization: 'Bearer ' + googleAccessToken } });
-    if (!res.ok) { console.warn('[Docs]', docId, 'HTTP', res.status); return { ok:false, status:res.status, doc:null }; }
+    if (!res.ok) return { ok:false, status:res.status, doc:null };
     return { ok:true, status:200, doc: await res.json() };
   } catch (e) { return { ok:false, status:0, doc:null }; }
 }
@@ -439,9 +449,7 @@ function extractTextFromDoc(doc) {
     for (const el of elements || []) {
       if (el.paragraph && el.paragraph.elements) {
         const parts = []; let strike = false;
-        for (const e of el.paragraph.elements) {
-          if (e.textRun) { parts.push(e.textRun.content || ''); if (e.textRun.textStyle && e.textRun.textStyle.strikethrough) strike = true; }
-        }
+        for (const e of el.paragraph.elements) { if (e.textRun) { parts.push(e.textRun.content || ''); if (e.textRun.textStyle && e.textRun.textStyle.strikethrough) strike = true; } }
         const line = parts.join('').replace(/\s+/g, ' ').trim();
         if (line) lines.push(strike ? '✓ ' + line : line);
       }
@@ -451,10 +459,6 @@ function extractTextFromDoc(doc) {
   walk(doc.body.content);
   return lines.join('\n');
 }
-
-// ════════════════════════════════════════════════════
-// MASTERSHEETS
-// ════════════════════════════════════════════════════
 async function fetchAllSheetTabs(sheetId) {
   if (!sheetId || !googleAccessToken) return { ok:false, status:0, text:'', tabs:0, rows:0 };
   try {
@@ -473,9 +477,6 @@ async function fetchAllSheetTabs(sheetId) {
   } catch (e) { return { ok:false, status:0, text:'', tabs:0, rows:0 }; }
 }
 
-// ════════════════════════════════════════════════════
-// KEYWORD PARSER
-// ════════════════════════════════════════════════════
 const FACTOR_KEYWORDS = {
   metaOptimised:    { triggers:['meta title','meta description','title tag','meta tags','on-page','on page seo','snippet'] },
   technicalClean:   { triggers:['technical audit','technical seo','robots.txt','sitemap','core web vitals','crawl errors','site speed','pagespeed'] },
@@ -517,9 +518,6 @@ function checkFactorInText(text, triggers, radius = 200) {
   return { detected: totalScore > 0, hits, score: totalScore };
 }
 
-// ════════════════════════════════════════════════════
-// WEB FETCH — backend chain with retry + headers
-// ════════════════════════════════════════════════════
 async function fetchOnce(backend, url) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 15000);
@@ -536,10 +534,7 @@ async function fetchViaProxy(url, expectHtml = false) {
   for (const backend of chain) {
     const r = await fetchOnce(backend, url);
     if (r.ok && r.text && r.text.length >= 5) {
-      if (expectHtml) {
-        const sample = r.text.slice(0, 2000).toLowerCase();
-        if (!/<html|<!doctype|<head|<body|<script|<meta|<title/.test(sample)) continue;
-      }
+      if (expectHtml) { const sample = r.text.slice(0, 2000).toLowerCase(); if (!/<html|<!doctype|<head|<body|<script|<meta|<title/.test(sample)) continue; }
       return { ...r, backend: backend.name };
     }
   }
@@ -547,23 +542,16 @@ async function fetchViaProxy(url, expectHtml = false) {
   for (const backend of chain) {
     const r = await fetchOnce(backend, url);
     if (r.ok && r.text && r.text.length >= 5) {
-      if (expectHtml) {
-        const sample = r.text.slice(0, 2000).toLowerCase();
-        if (!/<html|<!doctype|<head|<body|<script|<meta|<title/.test(sample)) continue;
-      }
+      if (expectHtml) { const sample = r.text.slice(0, 2000).toLowerCase(); if (!/<html|<!doctype|<head|<body|<script|<meta|<title/.test(sample)) continue; }
       return { ...r, backend: backend.name, retried: true };
     }
   }
   return { ok:false, status:0, text:'', backend:'none' };
 }
 
-// ════════════════════════════════════════════════════
-// HTML PARSERS
-// ════════════════════════════════════════════════════
 function checkMeta(html) {
   const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-  const descMatch  = html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i) ||
-                     html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']description["']/i);
+  const descMatch  = html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i) || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']description["']/i);
   const title = titleMatch ? titleMatch[1].trim() : '';
   const desc  = descMatch  ? descMatch[1].trim()  : '';
   return title.length >= 15 && title.length <= 75 && desc.length >= 70 && desc.length <= 200;
@@ -577,66 +565,44 @@ function checkAeoIntro(html) {
   return /^[A-Z]/.test(txt) && /[.!?]/.test(txt);
 }
 function checkAiCrawlersAllowed(robotsTxt) {
-  if (!robotsTxt) return false; // no robots = can't confirm allowed
+  if (!robotsTxt) return false;
   const bots = ['gptbot','claudebot','google-extended','perplexitybot','anthropic-ai','ccbot'];
   const lines = robotsTxt.split(/\r?\n/);
   let currentAgents = []; let blocked = false;
   for (const raw of lines) {
     const line = raw.trim();
     if (!line || line.startsWith('#')) continue;
-    if (/^user-agent:/i.test(line)) {
-      const agent = line.split(':')[1].trim().toLowerCase();
-      currentAgents = bots.some(b => agent === b) ? [agent] : [];
-    } else if (/^disallow:/i.test(line) && currentAgents.length) {
-      const path = line.split(':').slice(1).join(':').trim();
-      if (path === '/' || path === '*') { blocked = true; break; }
-    }
+    if (/^user-agent:/i.test(line)) { const agent = line.split(':')[1].trim().toLowerCase(); currentAgents = bots.some(b => agent === b) ? [agent] : []; }
+    else if (/^disallow:/i.test(line) && currentAgents.length) { const path = line.split(':').slice(1).join(':').trim(); if (path === '/' || path === '*') { blocked = true; break; } }
   }
   return !blocked;
 }
 function checkJsonLdType(html, types) {
   const scripts = [...html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)];
-  for (const m of scripts) {
-    for (const t of types) { const re = new RegExp('"@type"\\s*:\\s*"?' + t + '"?', 'i'); if (re.test(m[1])) return true; }
-  }
+  for (const m of scripts) { for (const t of types) { const re = new RegExp('"@type"\\s*:\\s*"?' + t + '"?', 'i'); if (re.test(m[1])) return true; } }
   return false;
 }
 
-// ════════════════════════════════════════════════════
-// AUDIT PIPELINE — fully serial web fetches per client
-// ════════════════════════════════════════════════════
 async function runLiveAudit(client, force = false) {
-  if (!force) {
-    const cached = getAuditCache(client.id);
-    if (cached && cached.data && (Date.now() - cached.timestamp < AUDIT_TTL_MS)) return cached.data;
-  }
+  if (!force) { const cached = getAuditCache(client.id); if (cached && cached.data && (Date.now() - cached.timestamp < AUDIT_TTL_MS)) return cached.data; }
   const base = client.gscSite.replace(/\/$/, '');
-
-  // Google APIs in parallel — they don't use the proxy
   const googlePromise = Promise.all([fetchGoogleDoc(client.docId), fetchAllSheetTabs(client.masterSheetId)]);
-
-  // Web fetches SERIAL — one at a time
   const llms    = await fetchViaProxy(base + '/llms.txt');
   const robots  = await fetchViaProxy(base + '/robots.txt');
   const sitemap = await fetchViaProxy(base + '/sitemap.xml');
   const home    = await fetchViaProxy(base + '/', true);
-
   const [docResp, sheetResp] = await googlePromise;
-
-  // Web audit — ONLY set keys we can confirm TRUE. Absent = "unverified" (not "false").
   const web = {};
   if (llms.ok && llms.text.trim().length > 30 && !/<html[\s>]|<!doctype/i.test(llms.text.slice(0, 200))) web.llmsTxtDone = true;
   if (robots.ok && checkAiCrawlersAllowed(robots.text)) web.aiCrawlerOpen = true;
   if (robots.ok && sitemap.ok) web.technicalClean = true;
   const isHtml = home.ok && /<html[\s>]|<!doctype|<head[\s>]|<body[\s>]/i.test(home.text.slice(0, 3000));
   if (isHtml) {
-    if (checkMeta(home.text))                                   web.metaOptimised   = true;
-    if (checkJsonLdType(home.text, ['FAQPage']))                web.faqSchemaDone   = true;
+    if (checkMeta(home.text)) web.metaOptimised = true;
+    if (checkJsonLdType(home.text, ['FAQPage'])) web.faqSchemaDone = true;
     if (checkJsonLdType(home.text, ['LocalBusiness','RoofingContractor','HomeAndConstructionBusiness','ProfessionalService','Organization'])) web.localSchemaDone = true;
-    if (checkAeoIntro(home.text))                               web.aeoIntroDone    = true;
+    if (checkAeoIntro(home.text)) web.aeoIntroDone = true;
   }
-
-  // Log audit — keyword/completion detection from logbook + mastersheet
   const docText   = docResp.doc ? extractTextFromDoc(docResp.doc) : '';
   const sheetText = sheetResp.text || '';
   const combined  = docText + '\n\n' + sheetText;
@@ -646,13 +612,11 @@ async function runLiveAudit(client, force = false) {
     logDetails[key] = r;
     if (r.detected) log[key] = true;
   }
-
   const audit = {
     web, log,
     _meta: {
       auditedAt: Date.now(),
-      fetches: { llmsStatus:llms.status, robotsStatus:robots.status, sitemapStatus:sitemap.status, homeStatus:home.status, homeIsHtml:isHtml,
-                 llmsBackend:llms.backend, robotsBackend:robots.backend, sitemapBackend:sitemap.backend, homeBackend:home.backend },
+      fetches: { llmsStatus:llms.status, robotsStatus:robots.status, sitemapStatus:sitemap.status, homeStatus:home.status, homeIsHtml:isHtml, llmsBackend:llms.backend, robotsBackend:robots.backend, sitemapBackend:sitemap.backend, homeBackend:home.backend },
       doc:   { ok:docResp.ok, status:docResp.status, chars:docText.length },
       sheet: { ok:sheetResp.ok, status:sheetResp.status, tabs:sheetResp.tabs, rows:sheetResp.rows, chars:sheetText.length },
       logHits: Object.fromEntries(Object.entries(logDetails).map(([k,v]) => [k, v.hits])),
@@ -662,14 +626,6 @@ async function runLiveAudit(client, force = false) {
   return audit;
 }
 
-// ════════════════════════════════════════════════════
-// SCORING — NO PLACEHOLDERS. Only manual + verified audit.
-// Priority (highest wins):
-//   1. Manual flag (your explicit click) — ALWAYS WINS for both true and false
-//   2. Web audit TRUE (live verified)
-//   3. Log audit TRUE (logbook keyword detected)
-//   4. Default FALSE (unverified)
-// ════════════════════════════════════════════════════
 function getEffectiveFlags(clientId) {
   const manual  = getManualFlags(clientId);
   const client  = CLIENTS.find(c => c.id === clientId);
@@ -678,10 +634,10 @@ function getEffectiveFlags(clientId) {
   const log = audit.log || {};
   const out = {};
   Object.keys(FACTORS).forEach(key => {
-    if (key in manual)         out[key] = !!manual[key];          // 1 — manual ALWAYS wins, including FALSE
-    else if (web[key] === true) out[key] = true;                  // 2
-    else if (log[key] === true) out[key] = true;                  // 3
-    else                       out[key] = false;                  // 4 — unverified default
+    if (key in manual) out[key] = !!manual[key];
+    else if (web[key] === true) out[key] = true;
+    else if (log[key] === true) out[key] = true;
+    else out[key] = false;
   });
   return out;
 }
@@ -697,40 +653,24 @@ function getFlagSource(clientId, key) {
 function calcScores(clientId, gscPosition) {
   const flags = getEffectiveFlags(clientId);
   let seo = 0, aeo = 0, lseo = 0;
-  Object.keys(FACTORS).forEach(key => {
-    const f = FACTORS[key]; if (!flags[key]) return;
-    if (f.cat === 'SEO')  seo  += f.pts;
-    if (f.cat === 'AEO')  aeo  += f.pts;
-    if (f.cat === 'LSEO') lseo += f.pts;
-  });
-  if (gscPosition > 0) {
-    if      (gscPosition <= 10) seo += 20;
-    else if (gscPosition <= 15) seo += 15;
-    else if (gscPosition <= 20) seo += 10;
-    else if (gscPosition <= 30) seo += 5;
-  }
+  Object.keys(FACTORS).forEach(key => { const f = FACTORS[key]; if (!flags[key]) return; if (f.cat === 'SEO') seo += f.pts; if (f.cat === 'AEO') aeo += f.pts; if (f.cat === 'LSEO') lseo += f.pts; });
+  if (gscPosition > 0) { if (gscPosition <= 10) seo += 20; else if (gscPosition <= 15) seo += 15; else if (gscPosition <= 20) seo += 10; else if (gscPosition <= 30) seo += 5; }
   return { seo: Math.min(seo, 100), aeo: Math.min(aeo, 100), lseo: Math.min(lseo, 100) };
 }
 
-// ════════════════════════════════════════════════════
-// CLIENT ROSTER
-// ════════════════════════════════════════════════════
 const CLIENTS = [
-  { id:'horvath-roofing',            name:'Horvath Roofing Inc.',       domain:'horvathroofinginc.com',        location:'Huron, OH',        color:'#6366F1', initials:'HR', sheetId:'1lVzRwzBNVuX6lv2stnuxcQIn8Z25CozbPocV2Xg0Qu8', sheetTab:'New Leads', gscSite:'https://horvathroofinginc.com/',        ga4:'G-5E4R1QXJL6',  gtm:'GTM-KK7B3LHN',  docId:'1dEhH6ysgp6nuoFSJmbFXxiMLxd186YORCsUgMkpnzOs', masterSheetId:'1kXi0EAUw3Ly5PaujLdMwgxSdHxF4zx6r_YRJyW8qhhs', gscData:null, liveLeads:null, liveAudit:null, auditing:false, get seo(){return calcScores(this.id,this.gscData?.position||0).seo}, get aeo(){return calcScores(this.id,this.gscData?.position||0).aeo}, get lseo(){return calcScores(this.id,this.gscData?.position||0).lseo} },
-  { id:'spennato-roofing',           name:'Spennato Family Roofing',    domain:'spennatoroofing.com',          location:'Philadelphia, PA', color:'#10B981', initials:'SF', sheetId:'14qh2Y_bzk2RDYnJCiAYVWc7xsQYEQQzZOXqX44HEtCs', sheetTab:'Sheet1',    gscSite:'https://spennatoroofing.com/',          ga4:'G-KHWXCEKMK1',  gtm:'GTM-KGM7KXC4',  docId:'1qa_ZIu-Z0O7cXQ47NcMo25r_JW0zP_4utqzUockvhSQ', masterSheetId:'1GLcnEXxfw4fEOHY_JCbkImLh1hEL4yXOIzMBV0Vtjo8', gscData:null, liveLeads:null, liveAudit:null, auditing:false, get seo(){return calcScores(this.id,this.gscData?.position||0).seo}, get aeo(){return calcScores(this.id,this.gscData?.position||0).aeo}, get lseo(){return calcScores(this.id,this.gscData?.position||0).lseo} },
-  { id:'link-exteriors',             name:'Link Exteriors',             domain:'linkexteriors.com',            location:'Chagrin Falls, OH',color:'#3B82F6', initials:'LE', sheetId:'1HIXWcKpHmaTDC1GMISn8Rz-EbJ29CALMgvN10S-ar3U', sheetTab:'Sheet1',    gscSite:'https://linkexteriors.com/',            ga4:'G-XSSQKZ9FH4',  gtm:'GTM-TTLKLQTC',  docId:'1mBxBEvOiRtLCBOUrhJI6ncMYtxe1P8cYl-Ns8QIwfPU', masterSheetId:'115hUbTJb6egTemfOP-dA32zCr6WiLaM7B9N7XBgbMxs', gscData:null, liveLeads:null, liveAudit:null, auditing:false, get seo(){return calcScores(this.id,this.gscData?.position||0).seo}, get aeo(){return calcScores(this.id,this.gscData?.position||0).aeo}, get lseo(){return calcScores(this.id,this.gscData?.position||0).lseo} },
-  { id:'5star-roofing',              name:'5 Star Roofing',             domain:'5starroofing-ca.com',          location:'Sacramento, CA',   color:'#EF4444', initials:'5S', sheetId:'1tEeI4BG0BvmR2PjDw0RqbAd9n69ODBdJs-h6RsHUWZA', sheetTab:'Sheet1',    gscSite:'https://5starroofing-ca.com/',          ga4:'G-PY5C6Y1H94',  gtm:'GTM-PPL47KPF',  docId:'1mCDEkv8pSCcGnjbbEW815FX_fmOe6B0iJaQKC_i4LhM', masterSheetId:'1p2H_p8wXQ_xv2e6ah3cI8sJUMQScAN1BAs_GNde0tRE', gscData:null, liveLeads:null, liveAudit:null, auditing:false, get seo(){return calcScores(this.id,this.gscData?.position||0).seo}, get aeo(){return calcScores(this.id,this.gscData?.position||0).aeo}, get lseo(){return calcScores(this.id,this.gscData?.position||0).lseo} },
-  { id:'highpoint-construction',     name:'Highpoint Construction',     domain:'highpointconstructionnd.com',  location:'Bismarck, ND',     color:'#8B5CF6', initials:'HC', sheetId:'1LY6C1ShhXpzbMrt8qFhcXXavn-hl1U7qYHQ91zsTS4w', sheetTab:'Sheet1',    gscSite:'https://highpointconstructionnd.com/',  ga4:'G-LBDL5ZNVV4',  gtm:'GTM-WM5R2D6V',  docId:'1mM9KDIogPN844zLQOt95wKGFTYBR-xa7FcGWM4su6xg', masterSheetId:'1EJz6Y-s3IcuNzq33m20XodydmnBMX0WCGSlY5jxJTD0', gscData:null, liveLeads:null, liveAudit:null, auditing:false, get seo(){return calcScores(this.id,this.gscData?.position||0).seo}, get aeo(){return calcScores(this.id,this.gscData?.position||0).aeo}, get lseo(){return calcScores(this.id,this.gscData?.position||0).lseo} },
-  { id:'colorado-preferred-roofing', name:'Colorado Preferred Roofing', domain:'coloradopreferredroofing.com', location:'Littleton, CO',    color:'#06B6D4', initials:'CP', sheetId:'1VTGXOKyjVGtQhH3Un-U3k-R7VTW6E4PIFd2EpUz-Sik', sheetTab:'Sheet1',    gscSite:'https://coloradopreferredroofing.com/', ga4:'G-DKVJHDC6N7',  gtm:'GTM-WST3T7NR',  docId:'1s280BZZ2Y4HZX-4DnKwE7Fksf9Ah4lokouBkXpkJEVU', masterSheetId:'1B6osmhF8Y3Xv3kJPrglSSsUweLcDuYrkPtwbDP9TC28', gscData:null, liveLeads:null, liveAudit:null, auditing:false, get seo(){return calcScores(this.id,this.gscData?.position||0).seo}, get aeo(){return calcScores(this.id,this.gscData?.position||0).aeo}, get lseo(){return calcScores(this.id,this.gscData?.position||0).lseo} },
-  { id:'shingle-hut',                name:'Shingle HUT Roofing',        domain:'hutserv.com',                  location:'Houston, TX',      color:'#F59E0B', initials:'SH', sheetId:'1TOEgAO5sjNG3Zx2fklmINVrpiBvwWY2qRqo8hkJ31BM', sheetTab:'Sheet1',    gscSite:'https://hutserv.com/',                  ga4:'G-JK0CF0GYWC',  gtm:'GTM-5ZVZS38J',  docId:'1A3WXW-CfTuXL-403R77rWKqr91WyrO8-l9NU2FRjGM4', masterSheetId:'1VlpGxfwktf3BOOGjtEq6IFamMeszDl_P3h1aaGFSSS8', gscData:null, liveLeads:null, liveAudit:null, auditing:false, get seo(){return calcScores(this.id,this.gscData?.position||0).seo}, get aeo(){return calcScores(this.id,this.gscData?.position||0).aeo}, get lseo(){return calcScores(this.id,this.gscData?.position||0).lseo} },
-  { id:'conway-roofing',             name:'Conway Property Mgmt',       domain:'conwaypropertymgmt.com',       location:'Austin, TX',       color:'#EC4899', initials:'CW', sheetId:'1Yu8Jtl72OmMGa6LnY2oFs-8CubWZtcTOLoPFhwzi-VM', sheetTab:'Sheet1',    gscSite:'https://conwaypropertymgmt.com/',       ga4:'G-YYJ7VFP2L8',  gtm:'GTM-PNBMN6QB',  docId:'1wZG7OR4E10aDH3hUvomQ4JHtGzI4TE1Kd4aoFajkJfQ', masterSheetId:'1P4QYWn20rZTr0ORkYpJzLoSKwzqsh2D-d7MqCn4xzvQ', gscData:null, liveLeads:null, liveAudit:null, auditing:false, get seo(){return calcScores(this.id,this.gscData?.position||0).seo}, get aeo(){return calcScores(this.id,this.gscData?.position||0).aeo}, get lseo(){return calcScores(this.id,this.gscData?.position||0).lseo} },
-  { id:'all-heights-roofing',        name:'All Heights Roofing',        domain:'allheightsroofing.com',        location:'Painesville, OH',  color:'#14B8A6', initials:'AH', sheetId:'1ZcRpTff3_StaYT8c3gWp5dDYXLkLlSn4uOtmAe8bUH0', sheetTab:'Sheet1',    gscSite:'https://allheightsroofing.com/',        ga4:'G-DLBFWRLQVY',  gtm:'GTM-WVDTW85Q',  docId:'1aLwu1riZ2mz9ivhCVkdi6MrwhDqrX2smBu9FiyEm7lU', masterSheetId:'1yntnYL39N0YSLJxjDdefcuzye43Dr7-IsnXownh_stA', gscData:null, liveLeads:null, liveAudit:null, auditing:false, get seo(){return calcScores(this.id,this.gscData?.position||0).seo}, get aeo(){return calcScores(this.id,this.gscData?.position||0).aeo}, get lseo(){return calcScores(this.id,this.gscData?.position||0).lseo} },
-  { id:'oneway-roof',                name:'Oneway Roof',                domain:'onewayroof.com',               location:'Phoenix, AZ',      color:'#F5A623', initials:'OR', sheetId:'1zxeIzaeg49kxal-VPM0s8XSaDtP5VCnIxh7ZxsxO9Qk', sheetTab:'Sheet1',    gscSite:'https://onewayroof.com/',               ga4:'G-8YKTNDKY6M',  gtm:'GTM-NPDCZ8ZP',  docId:'1JuICbk5u25LQhBOx417tcKUfn_b5WvN7Y7-w2axRtHE', masterSheetId:'1SlHAoI62gzQQPi3sIXha_xjpZ7CYqmrXeXyksHp5JcA', gscData:null, liveLeads:null, liveAudit:null, auditing:false, get seo(){return calcScores(this.id,this.gscData?.position||0).seo}, get aeo(){return calcScores(this.id,this.gscData?.position||0).aeo}, get lseo(){return calcScores(this.id,this.gscData?.position||0).lseo} },
+  { id:'horvath-roofing',            name:'Horvath Roofing Inc.',       domain:'horvathroofinginc.com',        location:'Huron, OH',        color:'#F5A623', initials:'HR', sheetId:'1lVzRwzBNVuX6lv2stnuxcQIn8Z25CozbPocV2Xg0Qu8', sheetTab:'New Leads', gscSite:'https://horvathroofinginc.com/',        ga4:'G-5E4R1QXJL6',  gtm:'GTM-KK7B3LHN',  docId:'1dEhH6ysgp6nuoFSJmbFXxiMLxd186YORCsUgMkpnzOs', masterSheetId:'1kXi0EAUw3Ly5PaujLdMwgxSdHxF4zx6r_YRJyW8qhhs', gscData:null, liveLeads:null, liveAudit:null, auditing:false, get seo(){return calcScores(this.id,this.gscData?.position||0).seo}, get aeo(){return calcScores(this.id,this.gscData?.position||0).aeo}, get lseo(){return calcScores(this.id,this.gscData?.position||0).lseo} },
+  { id:'spennato-roofing',           name:'Spennato Family Roofing',    domain:'spennatoroofing.com',          location:'Philadelphia, PA', color:'#34D399', initials:'SF', sheetId:'14qh2Y_bzk2RDYnJCiAYVWc7xsQYEQQzZOXqX44HEtCs', sheetTab:'Sheet1',    gscSite:'https://spennatoroofing.com/',          ga4:'G-KHWXCEKMK1',  gtm:'GTM-KGM7KXC4',  docId:'1qa_ZIu-Z0O7cXQ47NcMo25r_JW0zP_4utqzUockvhSQ', masterSheetId:'1GLcnEXxfw4fEOHY_JCbkImLh1hEL4yXOIzMBV0Vtjo8', gscData:null, liveLeads:null, liveAudit:null, auditing:false, get seo(){return calcScores(this.id,this.gscData?.position||0).seo}, get aeo(){return calcScores(this.id,this.gscData?.position||0).aeo}, get lseo(){return calcScores(this.id,this.gscData?.position||0).lseo} },
+  { id:'link-exteriors',             name:'Link Exteriors',             domain:'linkexteriors.com',            location:'Chagrin Falls, OH',color:'#60A5FA', initials:'LE', sheetId:'1HIXWcKpHmaTDC1GMISn8Rz-EbJ29CALMgvN10S-ar3U', sheetTab:'Sheet1',    gscSite:'https://linkexteriors.com/',            ga4:'G-XSSQKZ9FH4',  gtm:'GTM-TTLKLQTC',  docId:'1mBxBEvOiRtLCBOUrhJI6ncMYtxe1P8cYl-Ns8QIwfPU', masterSheetId:'115hUbTJb6egTemfOP-dA32zCr6WiLaM7B9N7XBgbMxs', gscData:null, liveLeads:null, liveAudit:null, auditing:false, get seo(){return calcScores(this.id,this.gscData?.position||0).seo}, get aeo(){return calcScores(this.id,this.gscData?.position||0).aeo}, get lseo(){return calcScores(this.id,this.gscData?.position||0).lseo} },
+  { id:'5star-roofing',              name:'5 Star Roofing',             domain:'5starroofing-ca.com',          location:'Sacramento, CA',   color:'#F87171', initials:'5S', sheetId:'1tEeI4BG0BvmR2PjDw0RqbAd9n69ODBdJs-h6RsHUWZA', sheetTab:'Sheet1',    gscSite:'https://5starroofing-ca.com/',          ga4:'G-PY5C6Y1H94',  gtm:'GTM-PPL47KPF',  docId:'1mCDEkv8pSCcGnjbbEW815FX_fmOe6B0iJaQKC_i4LhM', masterSheetId:'1p2H_p8wXQ_xv2e6ah3cI8sJUMQScAN1BAs_GNde0tRE', gscData:null, liveLeads:null, liveAudit:null, auditing:false, get seo(){return calcScores(this.id,this.gscData?.position||0).seo}, get aeo(){return calcScores(this.id,this.gscData?.position||0).aeo}, get lseo(){return calcScores(this.id,this.gscData?.position||0).lseo} },
+  { id:'highpoint-construction',     name:'Highpoint Construction',     domain:'highpointconstructionnd.com',  location:'Bismarck, ND',     color:'#A78BFA', initials:'HC', sheetId:'1LY6C1ShhXpzbMrt8qFhcXXavn-hl1U7qYHQ91zsTS4w', sheetTab:'Sheet1',    gscSite:'https://highpointconstructionnd.com/',  ga4:'G-LBDL5ZNVV4',  gtm:'GTM-WM5R2D6V',  docId:'1mM9KDIogPN844zLQOt95wKGFTYBR-xa7FcGWM4su6xg', masterSheetId:'1EJz6Y-s3IcuNzq33m20XodydmnBMX0WCGSlY5jxJTD0', gscData:null, liveLeads:null, liveAudit:null, auditing:false, get seo(){return calcScores(this.id,this.gscData?.position||0).seo}, get aeo(){return calcScores(this.id,this.gscData?.position||0).aeo}, get lseo(){return calcScores(this.id,this.gscData?.position||0).lseo} },
+  { id:'colorado-preferred-roofing', name:'Colorado Preferred Roofing', domain:'coloradopreferredroofing.com', location:'Littleton, CO',    color:'#22D3EE', initials:'CP', sheetId:'1VTGXOKyjVGtQhH3Un-U3k-R7VTW6E4PIFd2EpUz-Sik', sheetTab:'Sheet1',    gscSite:'https://coloradopreferredroofing.com/', ga4:'G-DKVJHDC6N7',  gtm:'GTM-WST3T7NR',  docId:'1s280BZZ2Y4HZX-4DnKwE7Fksf9Ah4lokouBkXpkJEVU', masterSheetId:'1B6osmhF8Y3Xv3kJPrglSSsUweLcDuYrkPtwbDP9TC28', gscData:null, liveLeads:null, liveAudit:null, auditing:false, get seo(){return calcScores(this.id,this.gscData?.position||0).seo}, get aeo(){return calcScores(this.id,this.gscData?.position||0).aeo}, get lseo(){return calcScores(this.id,this.gscData?.position||0).lseo} },
+  { id:'shingle-hut',                name:'Shingle HUT Roofing',        domain:'hutserv.com',                  location:'Houston, TX',      color:'#FBBF24', initials:'SH', sheetId:'1TOEgAO5sjNG3Zx2fklmINVrpiBvwWY2qRqo8hkJ31BM', sheetTab:'Sheet1',    gscSite:'https://hutserv.com/',                  ga4:'G-JK0CF0GYWC',  gtm:'GTM-5ZVZS38J',  docId:'1A3WXW-CfTuXL-403R77rWKqr91WyrO8-l9NU2FRjGM4', masterSheetId:'1VlpGxfwktf3BOOGjtEq6IFamMeszDl_P3h1aaGFSSS8', gscData:null, liveLeads:null, liveAudit:null, auditing:false, get seo(){return calcScores(this.id,this.gscData?.position||0).seo}, get aeo(){return calcScores(this.id,this.gscData?.position||0).aeo}, get lseo(){return calcScores(this.id,this.gscData?.position||0).lseo} },
+  { id:'conway-roofing',             name:'Conway Property Mgmt',       domain:'conwaypropertymgmt.com',       location:'Austin, TX',       color:'#F472B6', initials:'CW', sheetId:'1Yu8Jtl72OmMGa6LnY2oFs-8CubWZtcTOLoPFhwzi-VM', sheetTab:'Sheet1',    gscSite:'https://conwaypropertymgmt.com/',       ga4:'G-YYJ7VFP2L8',  gtm:'GTM-PNBMN6QB',  docId:'1wZG7OR4E10aDH3hUvomQ4JHtGzI4TE1Kd4aoFajkJfQ', masterSheetId:'1P4QYWn20rZTr0ORkYpJzLoSKwzqsh2D-d7MqCn4xzvQ', gscData:null, liveLeads:null, liveAudit:null, auditing:false, get seo(){return calcScores(this.id,this.gscData?.position||0).seo}, get aeo(){return calcScores(this.id,this.gscData?.position||0).aeo}, get lseo(){return calcScores(this.id,this.gscData?.position||0).lseo} },
+  { id:'all-heights-roofing',        name:'All Heights Roofing',        domain:'allheightsroofing.com',        location:'Painesville, OH',  color:'#2DD4BF', initials:'AH', sheetId:'1ZcRpTff3_StaYT8c3gWp5dDYXLkLlSn4uOtmAe8bUH0', sheetTab:'Sheet1',    gscSite:'https://allheightsroofing.com/',        ga4:'G-DLBFWRLQVY',  gtm:'GTM-WVDTW85Q',  docId:'1aLwu1riZ2mz9ivhCVkdi6MrwhDqrX2smBu9FiyEm7lU', masterSheetId:'1yntnYL39N0YSLJxjDdefcuzye43Dr7-IsnXownh_stA', gscData:null, liveLeads:null, liveAudit:null, auditing:false, get seo(){return calcScores(this.id,this.gscData?.position||0).seo}, get aeo(){return calcScores(this.id,this.gscData?.position||0).aeo}, get lseo(){return calcScores(this.id,this.gscData?.position||0).lseo} },
+  { id:'oneway-roof',                name:'Oneway Roof',                domain:'onewayroof.com',               location:'Phoenix, AZ',      color:'#FB923C', initials:'OR', sheetId:'1zxeIzaeg49kxal-VPM0s8XSaDtP5VCnIxh7ZxsxO9Qk', sheetTab:'Sheet1',    gscSite:'https://onewayroof.com/',               ga4:'G-8YKTNDKY6M',  gtm:'GTM-NPDCZ8ZP',  docId:'1JuICbk5u25LQhBOx417tcKUfn_b5WvN7Y7-w2axRtHE', masterSheetId:'1SlHAoI62gzQQPi3sIXha_xjpZ7CYqmrXeXyksHp5JcA', gscData:null, liveLeads:null, liveAudit:null, auditing:false, get seo(){return calcScores(this.id,this.gscData?.position||0).seo}, get aeo(){return calcScores(this.id,this.gscData?.position||0).aeo}, get lseo(){return calcScores(this.id,this.gscData?.position||0).lseo} },
 ];
 
-// ════════════════════════════════════════════════════
-// SPAM FILTERS
-// ════════════════════════════════════════════════════
 const SPAM_EMAILS = ['testbydev@gmail.com','dev@kingcontractor.com','analytics@kingcontractor.com','duane@kingcontractor.com','kingcontractor@gmail.com','test@test.com','test@gmail.com','testbydev111@gmail.com','testlead@gmail.com','testleadbydev@gmail.com','testbydevs@gmail.com','dev1@kingcontractor.com','dev@kingcontractor.co','michelle@kingcontractor.com','ken@kingcontractor.com','dean@test.com','info@speed-seo.net','info@gfleads.com','noreply@gmail.com','gary.charles@dominatingkeywords.com','garycharles@dominatingkeywords.com','davidw@magwitch.com','jordan.visser@integribridge.com','april26214@myleadshero.com','aaron@estimationhubinc.com','partners@gpe-partners.com','info@digital-x-press.com','mike@monkeydigital.co','brad.caulfield@digitalsevenagency.com','james@contentpowered.net','nicolas.salomon@gmail.com','nicolassalomonmkts@gmail.com','rob@businesscoachvas.com','rachel@businesscoachvas.com','jordan@businesscoachvas.com','denisse@vasdirect.com','sean.hicks@dominatingkeywords.com','noreply@remotelawstaffing.com','contactbusinessloanuk@gmail.com','scott.johnson.playa@outlook.com','lindahopkinsmkt@gmail.com','gloria.mueller.mkt@gmail.com','jaxonsmithseomaster@gmail.com','kellywebmarketing01@gmail.com','lisaseodigitalexpert@gmail.com','jessicaseocarnerdigital@gmail.com','ellasmithdigitalexpert@gmail.com','kristinjohnson3649@gmail.com','august193@businessbrokersleads.com','aug193@businessbrokersleads.com','rushort9@gmail.com','milesbiles8@gmail.com'];
 const SPAM_KEYWORDS = ['seo service','backlink','guest post','wikipedia','digital marketing agency','pay per click','rank higher','do not process','ignore this','link building service','content powered','speed-seo','monkey digital','zoomwings','magwitch','gfleads','ai employee','business broker','selling your business','financing options','domain for sale','social media marketing service','chatbot service','we can help your business rank'];
 const SPAM_NAMES = ['test','dev','testing','developer','king contractor','analytics','bot','bradley','michelle fernandes','duane','xrumer','speedyindex','gregorypaype'];
@@ -745,9 +685,6 @@ function isSpam(row) {
   return false;
 }
 
-// ════════════════════════════════════════════════════
-// STATE
-// ════════════════════════════════════════════════════
 let googleAccessToken = null;
 let tokenClient = null;
 let allLiveLeads = [];
@@ -757,17 +694,10 @@ let generatedReports = [];
 let currentView = 'overview';
 let refreshInterval = null;
 
-// ════════════════════════════════════════════════════
-// OAUTH
-// ════════════════════════════════════════════════════
 function startGoogleSignIn() {
   if (!window.google) { showGError('Google Identity Services not loaded. Please refresh.'); return; }
   if (!tokenClient) {
-    tokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: OAUTH_CLIENT_ID, scope: SCOPES,
-      callback: handleTokenResponse,
-      error_callback: err => showGError('Sign in failed: '+(err.message||err.type||'unknown error')),
-    });
+    tokenClient = google.accounts.oauth2.initTokenClient({ client_id: OAUTH_CLIENT_ID, scope: SCOPES, callback: handleTokenResponse, error_callback: err => showGError('Sign in failed: '+(err.message||err.type||'unknown error')), });
   }
   tokenClient.requestAccessToken({ prompt: '' });
 }
@@ -778,11 +708,7 @@ async function handleTokenResponse(tokenResponse) {
     const res  = await fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+googleAccessToken}});
     const user = await res.json();
     const email = (user.email||'').toLowerCase();
-    if (!email.endsWith('@kingcontractor.com')) {
-      if (window.google) google.accounts.oauth2.revoke(googleAccessToken);
-      googleAccessToken = null;
-      showGError('Access restricted to @kingcontractor.com accounts only.'); return;
-    }
+    if (!email.endsWith('@kingcontractor.com')) { if (window.google) google.accounts.oauth2.revoke(googleAccessToken); googleAccessToken = null; showGError('Access restricted to @kingcontractor.com accounts only.'); return; }
     if (user.picture) { const img=document.getElementById('user-avatar-img'); img.src=user.picture; img.style.display='block'; document.getElementById('user-avatar-fb').style.display='none'; }
     document.getElementById('user-avatar-fb').textContent=(user.given_name||user.email.split('@')[0]||'K').charAt(0).toUpperCase();
     document.getElementById('user-email-label').textContent=user.email;
@@ -799,34 +725,20 @@ function signOut() {
   showToast('Signed out');
 }
 
-// ════════════════════════════════════════════════════
-// SHEETS (leads)
-// ════════════════════════════════════════════════════
 async function fetchSheetOAuth(sheetId, sheetTab) {
   if (!sheetId||!googleAccessToken) return [];
   const range = encodeURIComponent((sheetTab||'Sheet1')+'!A1:Z2000');
-  try {
-    const res = await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+sheetId+'/values/'+range,{headers:{Authorization:'Bearer '+googleAccessToken}});
-    if (!res.ok) return [];
-    return parseSheetValues((await res.json()).values||[]);
-  } catch(e) { return []; }
+  try { const res = await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+sheetId+'/values/'+range,{headers:{Authorization:'Bearer '+googleAccessToken}}); if (!res.ok) return []; return parseSheetValues((await res.json()).values||[]); } catch(e) { return []; }
 }
 function parseSheetValues(rows) { if (!rows||rows.length<2) return []; const headers=rows[0]; return rows.slice(1).map(row=>{const o={};headers.forEach((h,i)=>{o[h]=row[i]||'';});return o;}); }
 function findCol(row, keywords) {
   const keys=Object.keys(row);
-  for (const kw of keywords) {
-    if (row[kw]!==undefined&&String(row[kw]).trim()) return String(row[kw]).trim();
-    const m=keys.find(k=>k.toLowerCase().includes(kw.toLowerCase()));
-    if (m&&String(row[m]).trim()) return String(row[m]).trim();
-  }
+  for (const kw of keywords) { if (row[kw]!==undefined&&String(row[kw]).trim()) return String(row[kw]).trim(); const m=keys.find(k=>k.toLowerCase().includes(kw.toLowerCase())); if (m&&String(row[m]).trim()) return String(row[m]).trim(); }
   return '';
 }
 function normalizeRows(rows, client) { return rows.map(row=>({name:findCol(row,['name|name-1','name-1','First Name','full name','name','Name']),email:findCol(row,['email|email-1','email-1','email','Email','e-mail']),phone:findCol(row,['phone|phone-1','phone-1','phone','Phone','mobile','tel']),msg:findCol(row,['textarea|textarea-1','textarea-1','Message','message','comment','project','description']),date:findCol(row,['Date|hidden-2','hidden-2','date','Date','submitted','timestamp']),source:findCol(row,['Form|hidden-4','hidden-4','form','Form','source','page title']),url:findCol(row,['Page URL|hidden-3','hidden-3','page url','Page URL','url']),client})); }
 function getGenuineLeads(rows, client) { return normalizeRows(rows,client).filter(r=>r.name&&r.name.trim()&&!isSpam(r)); }
 
-// ════════════════════════════════════════════════════
-// GSC
-// ════════════════════════════════════════════════════
 const fmt = d => d.toISOString().slice(0,10);
 function getRangeDates(range) {
   const end = new Date(); const start = new Date();
@@ -857,9 +769,6 @@ async function fetchGSCRange(siteUrl, range) {
 }
 async function fetchGSC(siteUrl) { return fetchGSCRange(siteUrl, '7d'); }
 
-// ════════════════════════════════════════════════════
-// INIT
-// ════════════════════════════════════════════════════
 async function initDashboard() {
   ensureDefaultPausedSeeded();
   if (isPaused(selectedClientId)) { const first = getActiveClients()[0]; if (first) selectedClientId = first.id; }
@@ -876,16 +785,11 @@ async function runAllAudits(force = false) {
   const active = getActiveClients();
   for (let i = 0; i < active.length; i++) {
     const c = active[i];
-    if (!force) {
-      const cached = getAuditCache(c.id);
-      if (cached && (Date.now() - cached.timestamp < AUDIT_TTL_MS)) { c.liveAudit = cached.data; continue; }
-    }
+    if (!force) { const cached = getAuditCache(c.id); if (cached && (Date.now() - cached.timestamp < AUDIT_TTL_MS)) { c.liveAudit = cached.data; continue; } }
     c.auditing = true;
     if (currentView === 'overview') buildClientGrid();
     if (currentView === 'tracking' && selectedClientId === c.id) renderTrackingDetail();
-    try {
-      c.liveAudit = await runLiveAudit(c, force);
-    } catch (err) { console.warn('[Audit] failed', c.id, err); }
+    try { c.liveAudit = await runLiveAudit(c, force); } catch (err) { console.warn('[Audit] failed', c.id, err); }
     c.auditing = false;
     if (currentView === 'overview') buildClientGrid();
     if (currentView === 'tracking' && selectedClientId === c.id) renderTrackingDetail();
@@ -898,15 +802,12 @@ async function loadAllData() {
   const timeStr=now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
   allLiveLeads=[];
   await Promise.all(getActiveClients().map(async client=>{
-    if (client.sheetId) {
-      try { const rows=await fetchSheetOAuth(client.sheetId,client.sheetTab||'Sheet1'); const genuine=getGenuineLeads(rows,client); client.liveLeads=genuine.length; genuine.forEach(lead=>allLiveLeads.push({...lead,clientObj:client})); }
-      catch(e){}
-    }
+    if (client.sheetId) { try { const rows=await fetchSheetOAuth(client.sheetId,client.sheetTab||'Sheet1'); const genuine=getGenuineLeads(rows,client); client.liveLeads=genuine.length; genuine.forEach(lead=>allLiveLeads.push({...lead,clientObj:client})); } catch(e){} }
     try { client.gscData=await fetchGSC(client.gscSite); } catch(e){}
   }));
   allLiveLeads.sort((a,b)=>parseDateStr(b.date)-parseDateStr(a.date));
   ['sheet-sync-time','leads-sync-time'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=`Synced ${timeStr}`;});
-  document.getElementById('last-updated-badge').innerHTML=`<svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3" fill="currentColor"/></svg> Live · ${timeStr}`;
+  document.getElementById('last-updated-badge').innerHTML=`<svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3" fill="currentColor"/></svg> ${timeStr}`;
 }
 function parseDateStr(str) {
   if (!str) return new Date(0);
@@ -915,9 +816,6 @@ function parseDateStr(str) {
   return new Date(str);
 }
 
-// ════════════════════════════════════════════════════
-// NAVIGATION
-// ════════════════════════════════════════════════════
 function switchView(view) {
   currentView=view;
   ['overview','leads','tracking','reports','paused'].forEach(v=>{const el=document.getElementById(`view-${v}`);if(el)el.style.display=v===view?'block':'none';});
@@ -932,8 +830,8 @@ function renderPausedView() {
   updatePausedCount();
   const paused = CLIENTS.filter(c => isPaused(c.id));
   const container = document.getElementById('paused-list'); if (!container) return;
-  if (!paused.length) { container.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg><p>No paused clients. All ${CLIENTS.length} clients actively tracked.</p></div>`; return; }
-  container.innerHTML = paused.map(c => `<div class="client-card" style="opacity:0.7;border-style:dashed"><div class="client-card-head"><div class="client-avatar" style="background:${c.color}22;color:${c.color};filter:grayscale(0.4)">${c.initials}</div><div style="flex:1;min-width:0"><div class="client-name">${c.name}</div><div class="client-domain">${c.domain}</div><div style="font-size:10px;color:var(--dim);margin-top:2px">${c.location}</div></div><span class="badge badge-gray">PAUSED</span></div><div style="font-size:11px;color:var(--dim);padding:8px 0;border-top:1px solid var(--border);margin-top:8px">No active tracking. Frozen at last-known state.</div><div style="display:flex;gap:6px;margin-top:10px"><button class="btn btn-primary" style="flex:1;justify-content:center;font-size:11px" onclick="unpauseClient('${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>Resume</button>${c.docId ? `<a class="btn btn-ghost" style="font-size:11px" href="https://docs.google.com/document/d/${c.docId}/edit" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></a>` : ''}</div></div>`).join('');
+  if (!paused.length) { container.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg><p>No paused clients.</p></div>`; return; }
+  container.innerHTML = paused.map(c => `<div class="client-card" style="opacity:0.7;border-style:dashed"><div class="client-card-head"><div class="client-avatar" style="background:${c.color}22;color:${c.color};filter:grayscale(0.4)">${c.initials}</div><div style="flex:1;min-width:0"><div class="client-name">${c.name}</div><div class="client-domain">${c.domain}</div><div style="font-size:10px;color:var(--dim);margin-top:2px">${c.location}</div></div><span class="badge badge-gray">Paused</span></div><div style="font-size:11px;color:var(--dim);padding:8px 0;border-top:1px solid var(--border);margin-top:8px">Frozen at last-known state.</div><div style="display:flex;gap:6px;margin-top:10px"><button class="btn btn-primary" style="flex:1;justify-content:center" onclick="unpauseClient('${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>Resume</button>${c.docId ? `<a class="btn btn-ghost" href="https://docs.google.com/document/d/${c.docId}/edit" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></a>` : ''}</div></div>`).join('');
 }
 function selectClient(id) {
   if (isPaused(id)) { showToast('Client paused. Resume from Paused tab first.'); switchView('paused'); return; }
@@ -947,9 +845,6 @@ function selectClient(id) {
 }
 async function refreshAll() { showToast('Refreshing...'); await loadAllData(); buildStatStrip(); buildClientGrid(); renderLeadsFeed(); if (currentView==='tracking') renderTrackingDetail(); showToast('Refreshed'); }
 
-// ════════════════════════════════════════════════════
-// MANUAL TOGGLE — sets explicit true/false, ALWAYS wins, survives re-audits
-// ════════════════════════════════════════════════════
 function toggleManualFlag(clientId, factorKey) {
   const current = !!getEffectiveFlags(clientId)[factorKey];
   setManualFlag(clientId, factorKey, !current);
@@ -961,18 +856,15 @@ async function reauditClient(clientId) {
   const c = CLIENTS.find(x => x.id === clientId); if (!c) return;
   clearAuditCache(clientId);
   c.auditing = true; renderTrackingDetail();
-  showToast('Re-auditing ' + c.name + ' (manual ticks preserved)...');
+  showToast('Re-auditing ' + c.name + '...');
   try { c.liveAudit = await runLiveAudit(c, true); showToast('Audit complete'); }
   catch (e) { showToast('Audit failed'); }
   c.auditing = false; renderTrackingDetail(); buildClientGrid(); buildStatStrip();
 }
 
-// ════════════════════════════════════════════════════
-// BUILD UI
-// ════════════════════════════════════════════════════
 function buildStatStripLoading() {
   document.getElementById('stat-strip').innerHTML=['Total Live Leads','Leads (period)','GSC Connected','Avg. SEO Score','Active / Paused'].map(l=>
-    `<div class="stat-card"><div class="stat-top" style="background:linear-gradient(90deg,#6366F180,#6366F120)"></div><div class="stat-body"><div class="stat-label">${l}</div><div class="stat-value stat-loading" style="color:#6366F1">...</div><div class="stat-sub"><span class="trend-flat">—</span> Loading...</div></div></div>`).join('');
+    `<div class="stat-card"><div class="stat-top" style="background:var(--gold)"></div><div class="stat-body"><div class="stat-label">${l}</div><div class="stat-value stat-loading" style="color:var(--gold)">...</div><div class="stat-sub"><span class="trend-flat">—</span> Loading...</div></div></div>`).join('');
 }
 function buildClientGridLoading() {
   document.getElementById('client-grid').innerHTML=getActiveClients().map(c=>
@@ -980,7 +872,7 @@ function buildClientGridLoading() {
 }
 function buildClientNav() {
   document.getElementById('client-nav-list').innerHTML = getActiveClients().map(c=>
-    `<a class="nav-item" onclick="selectClient('${c.id}')" style="font-size:12px;"><div class="nav-item-icon" style="background:${c.color}22;"><span style="font-size:9px;font-weight:800;color:${c.color}">${c.initials}</span></div>${c.name.length>20?c.name.slice(0,20)+'…':c.name}</a>`).join('');
+    `<a class="nav-item" onclick="selectClient('${c.id}')" style="font-size:12px;"><div class="nav-item-icon" style="background:${c.color}18;border-radius:2px"><span style="font-size:9px;font-weight:800;color:${c.color};letter-spacing:0.04em">${c.initials}</span></div>${c.name.length>20?c.name.slice(0,20)+'…':c.name}</a>`).join('');
 }
 
 function buildStatStrip() {
@@ -993,18 +885,16 @@ function buildStatStrip() {
   const periodLeads=allLiveLeads.filter(l=>parseDateStr(l.date)>=cutoff).length;
   const pausedCount = getPausedClients().length;
 
-  const rangeToggle = `<div class="leads-toggle">
-    ${[7,30,90].map(d=>`<button class="${d===days?'active':''}" onclick="setLeadsRangeDays(${d})">${d}D</button>`).join('')}
-  </div>`;
+  const rangeToggle = `<div class="leads-toggle">${[7,30,90].map(d=>`<button class="${d===days?'active':''}" onclick="setLeadsRangeDays(${d})">${d}D</button>`).join('')}</div>`;
 
   const stats=[
-    {label:'Total Live Leads',value:totalLeads,sub:'From Google Sheets',trend:'up',color:'#6366F1', extra:''},
-    {label:`Leads (${days}d)`,value:periodLeads,sub:'Genuine homeowners',trend:'up',color:'#3B82F6', extra:rangeToggle},
-    {label:'GSC Connected',value:gscOk+'/'+active.length,sub:'Live ranking data',trend:gscOk===active.length?'up':'flat',color:'#10B981', extra:''},
-    {label:'Avg. SEO Score',value:avgSEO+'%',sub:'Verified across active clients',trend:'flat',color:'#F5A623', extra:''},
+    {label:'Total Live Leads',value:totalLeads,sub:'From Google Sheets',trend:'up',color:'#F5A623', extra:''},
+    {label:`Leads (${days}d)`,value:periodLeads,sub:'Genuine homeowners',trend:'up',color:'#FFB627', extra:rangeToggle},
+    {label:'GSC Connected',value:gscOk+'/'+active.length,sub:'Live ranking data',trend:gscOk===active.length?'up':'flat',color:'#34D399', extra:''},
+    {label:'Avg. SEO Score',value:avgSEO+'%',sub:'Verified across active',trend:'flat',color:'#F5A623', extra:''},
     {label:'Active / Paused',value:active.length+' / '+pausedCount,sub:'Tracking '+active.length+' of '+CLIENTS.length,trend:pausedCount===0?'up':'flat',color:'#34D399', extra:''},
   ];
-  document.getElementById('stat-strip').innerHTML=stats.map(s=>`<div class="stat-card"><div class="stat-top" style="background:linear-gradient(90deg,${s.color}80,${s.color}20)"></div><div class="stat-body">${s.extra}<div class="stat-label">${s.label}</div><div class="stat-value" style="color:${s.color}">${s.value}</div><div class="stat-sub"><span class="trend-${s.trend}">${s.trend==='up'?'▲':s.trend==='down'?'▼':'—'}</span> ${s.sub}</div></div></div>`).join('');
+  document.getElementById('stat-strip').innerHTML=stats.map(s=>`<div class="stat-card"><div class="stat-top" style="background:${s.color}"></div><div class="stat-body">${s.extra}<div class="stat-label">${s.label}</div><div class="stat-value" style="color:${s.color}">${s.value}</div><div class="stat-sub"><span class="trend-${s.trend}">${s.trend==='up'?'▲':s.trend==='down'?'▼':'—'}</span> ${s.sub}</div></div></div>`).join('');
 }
 
 function buildClientGrid() {
@@ -1014,7 +904,7 @@ function buildClientGrid() {
     const recent=allLiveLeads.filter(l=>l.clientObj.id===c.id&&parseDateStr(l.date)>=cutoff).length;
     const total=typeof c.liveLeads==='number'?c.liveLeads:'—';
     const gsc=c.gscData;
-    return `<div class="client-card" data-id="${c.id}" onclick="selectClient('${c.id}')"><div class="client-card-head"><div class="client-avatar" style="background:${c.color}22;color:${c.color}">${c.initials}</div><div style="flex:1;min-width:0"><div class="client-name">${c.name}</div><div class="client-domain">${c.domain}</div><div style="font-size:10px;color:var(--dim);margin-top:2px">${c.location}</div></div><div class="client-status">${statusBadge(c)}</div></div><div class="score-row">${scorePill('SEO',c.seo,c.auditing)}${scorePill('AEO',c.aeo,c.auditing)}${scorePill('LSEO',c.lseo,c.auditing)}</div><div class="client-metrics"><div class="client-metric"><div class="cm-label">Leads</div><div class="cm-value" style="color:var(--accent)">${total}</div><div class="cm-trend" style="font-size:9px;color:#34D399">Live</div></div><div class="client-metric"><div class="cm-label">${days}d</div><div class="cm-value" style="color:var(--blue)">${recent}</div><div class="cm-trend" style="font-size:9px;color:var(--dim)">genuine</div></div><div class="client-metric"><div class="cm-label">Clicks</div><div class="cm-value" style="color:${gsc?'#34D399':'var(--dim)'}">${gsc?gsc.clicks.toLocaleString():'—'}</div><div class="cm-trend" style="font-size:9px">${gsc?'GSC 7d':'no data'}</div></div><div class="client-metric"><div class="cm-label">Avg Pos</div><div class="cm-value" style="color:${gsc?'#FCD34D':'var(--dim)'}">${gsc?gsc.position:'—'}</div><div class="cm-trend" style="font-size:9px">${gsc?gsc.ctr+'% CTR':''}</div></div></div></div>`;
+    return `<div class="client-card" data-id="${c.id}" onclick="selectClient('${c.id}')"><div class="client-card-head"><div class="client-avatar" style="background:${c.color}22;color:${c.color}">${c.initials}</div><div style="flex:1;min-width:0"><div class="client-name">${c.name}</div><div class="client-domain">${c.domain}</div><div style="font-size:10px;color:var(--dim);margin-top:2px">${c.location}</div></div><div class="client-status">${statusBadge(c)}</div></div><div class="score-row">${scorePill('SEO',c.seo,c.auditing)}${scorePill('AEO',c.aeo,c.auditing)}${scorePill('LSEO',c.lseo,c.auditing)}</div><div class="client-metrics"><div class="client-metric"><div class="cm-label">Leads</div><div class="cm-value" style="color:var(--gold)">${total}</div><div class="cm-trend" style="font-size:9px;color:#34D399">Live</div></div><div class="client-metric"><div class="cm-label">${days}d</div><div class="cm-value" style="color:#FFB627">${recent}</div><div class="cm-trend" style="font-size:9px;color:var(--dim)">genuine</div></div><div class="client-metric"><div class="cm-label">Clicks</div><div class="cm-value" style="color:${gsc?'#34D399':'var(--dim)'}">${gsc?gsc.clicks.toLocaleString():'—'}</div><div class="cm-trend" style="font-size:9px">${gsc?'GSC 7d':'no data'}</div></div><div class="client-metric"><div class="cm-label">Avg Pos</div><div class="cm-value" style="color:${gsc?'var(--gold)':'var(--dim)'}">${gsc?gsc.position:'—'}</div><div class="cm-trend" style="font-size:9px">${gsc?gsc.ctr+'% CTR':''}</div></div></div></div>`;
   }).join('');
 }
 function buildClientTabs() {
@@ -1028,9 +918,6 @@ function buildReportClientDropdown() {
   getActiveClients().forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.name;sel.appendChild(o);});
 }
 
-// ════════════════════════════════════════════════════
-// LEADS FEED
-// ════════════════════════════════════════════════════
 function filterLeads(filter, btn) { currentFilter=filter; document.querySelectorAll('#view-leads .tab').forEach(t=>t.classList.remove('active')); if(btn)btn.classList.add('active'); renderLeadsFeed(); }
 function renderLeadsFeed() {
   const filtered=currentFilter==='all'?allLiveLeads:allLiveLeads.filter(l=>l.clientObj.id===currentFilter);
@@ -1040,32 +927,28 @@ function renderLeadsFeed() {
   body.innerHTML=filtered.slice(0,150).map(lead=>{const c=lead.clientObj;const ini=(lead.name||'?').split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();const dateDisplay=lead.date?lead.date.split('/').slice(0,3).join('/'):'';const phone=(lead.phone||'').replace(/[^0-9+() -]/g,'').slice(0,20);const msg=(lead.msg||'').slice(0,80)+((lead.msg||'').length>80?'...':'');return `<div class="lead-row"><div class="lead-avatar" style="background:${c.color}22;color:${c.color}">${ini}</div><div style="flex:1;min-width:0"><div class="lead-name">${lead.name||'Unknown'}</div><div class="lead-client">${c.domain}</div></div>${phone?`<div class="lead-phone">${phone}</div>`:''}${msg?`<div class="lead-msg">${msg}</div>`:''}<div class="lead-source">${(lead.source||'Form').replace(' Form','').slice(0,20)}</div><div class="lead-date">${dateDisplay}</div></div>`;}).join('');
 }
 
-// ════════════════════════════════════════════════════
-// AUDIT DETAILS + FACTOR PANEL
-// ════════════════════════════════════════════════════
 function buildAuditDetailsPanel(client) {
   const a = client.liveAudit;
-  if (!a || !a._meta) return `<div class="detail-card" style="margin-bottom:16px"><div class="detail-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div class="detail-card-title">Live Data Sources</div><span style="margin-left:auto;font-size:11px;color:var(--dim)">${client.auditing?'Running...':'Not yet audited — click any box below to set manually'}</span><button class="btn btn-ghost" style="margin-left:8px;padding:4px 10px;font-size:11px" onclick="reauditClient('${client.id}')" ${client.auditing?'disabled':''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>${client.auditing?'Auditing...':'Run audit'}</button></div></div>`;
+  if (!a || !a._meta) return `<div class="detail-card" style="margin-bottom:14px"><div class="detail-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div class="detail-card-title">Live Data Sources</div><span style="margin-left:auto;font-size:11px;color:var(--dim)">${client.auditing?'Running...':'Click checkboxes below to set manually'}</span><button class="btn btn-ghost" style="margin-left:8px;padding:5px 10px;font-size:10px" onclick="reauditClient('${client.id}')" ${client.auditing?'disabled':''}>${client.auditing?'Auditing...':'Run Audit'}</button></div></div>`;
   const m = a._meta;
-  // Defensive: handle both old (m.web.*) and new (m.fetches.*) cache shapes
   const f = m.fetches || m.web || {};
   const doc = m.doc || {};
   const sheet = m.sheet || {};
   const ageMin = Math.round((Date.now() - m.auditedAt) / 60000);
   const ageLabel = ageMin < 1 ? 'Just now' : ageMin < 60 ? ageMin + 'm ago' : Math.round(ageMin/60) + 'h ago';
   const dot = (ok) => `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${ok?'#34D399':'#F87171'};margin-right:6px"></span>`;
-  const backendLabel = (b) => b && b !== 'none' ? ` <span style="font-size:9px;color:var(--dim);padding:1px 5px;border:1px solid var(--border);border-radius:3px;margin-left:4px">${b}</span>` : '';
-  const row = (label, ok, detail, backend) => `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;font-size:12px;border-bottom:1px solid var(--border)"><div style="flex:1">${dot(ok)}${label}${backendLabel(backend)}</div><div style="color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:11px">${detail}</div></div>`;
+  const backendLabel = (b) => b && b !== 'none' ? ` <span style="font-size:9px;color:var(--dim);padding:2px 5px;border:1px solid var(--border);border-radius:2px;margin-left:4px;letter-spacing:0.04em;text-transform:uppercase">${b}</span>` : '';
+  const row = (label, ok, detail, backend) => `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;font-size:12px;border-bottom:1px solid var(--border)"><div style="flex:1">${dot(ok)}${label}${backendLabel(backend)}</div><div style="color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:10px">${detail}</div></div>`;
   const logHits = Object.entries(m.logHits||{}).filter(([,n])=>n>0).length;
-  return `<div class="detail-card" style="margin-bottom:16px"><div class="detail-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><div class="detail-card-title">Live Data Sources — ${ageLabel}</div><button class="btn btn-ghost" style="margin-left:auto;padding:4px 10px;font-size:11px" onclick="reauditClient('${client.id}')" ${client.auditing?'disabled':''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>${client.auditing?'Auditing...':'Re-audit'}</button></div><div class="detail-card-body" style="padding:8px 16px">
+  return `<div class="detail-card" style="margin-bottom:14px"><div class="detail-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><div class="detail-card-title">Live Data Sources — ${ageLabel}</div><button class="btn btn-ghost" style="margin-left:auto;padding:5px 10px;font-size:10px" onclick="reauditClient('${client.id}')" ${client.auditing?'disabled':''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>${client.auditing?'Auditing...':'Re-audit'}</button></div><div class="detail-card-body" style="padding:8px 16px">
     ${row('Logbook (Google Doc)', doc.ok, doc.ok ? (doc.chars||0).toLocaleString() + ' chars' : 'HTTP ' + (doc.status||0) + (doc.status===403?' — re-auth needed':''))}
     ${row('MasterSheet (Google Sheet)', sheet.ok, sheet.ok ? (sheet.tabs||0) + ' tabs, ' + (sheet.rows||0) + ' rows' : 'HTTP ' + (sheet.status||0))}
-    ${row('Homepage HTML', f.homeStatus===200 && f.homeIsHtml, f.homeStatus===200 ? (f.homeIsHtml?'200 OK — HTML parsed':'200 — but not raw HTML') : 'HTTP ' + (f.homeStatus||0), f.homeBackend)}
+    ${row('Homepage HTML', f.homeStatus===200 && f.homeIsHtml, f.homeStatus===200 ? (f.homeIsHtml?'200 OK — HTML parsed':'200 — not raw HTML') : 'HTTP ' + (f.homeStatus||0), f.homeBackend)}
     ${row('robots.txt', f.robotsStatus===200, 'HTTP ' + (f.robotsStatus||0), f.robotsBackend)}
     ${row('sitemap.xml', f.sitemapStatus===200, 'HTTP ' + (f.sitemapStatus||0), f.sitemapBackend)}
     ${row('llms.txt', f.llmsStatus===200, 'HTTP ' + (f.llmsStatus||0) + (f.llmsStatus===200?' — present':''), f.llmsBackend)}
-    <div style="display:flex;align-items:center;gap:10px;padding:6px 0;font-size:12px"><div style="flex:1">${dot(logHits>0)}Logbook keyword matches</div><div style="color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:11px">${logHits} of ${Object.keys(m.logHits||{}).length} factors detected</div></div>
-    <div style="padding:8px 0 4px;font-size:10px;color:var(--dim);line-height:1.5"><strong style="color:var(--muted)">If web fetches fail or schema isn't detected:</strong> click any checkbox in the Score Factors panel below to mark it manually — that override is permanent and never reset by re-audits.</div>
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 0;font-size:12px"><div style="flex:1">${dot(logHits>0)}Logbook keyword matches</div><div style="color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:10px">${logHits} of ${Object.keys(m.logHits||{}).length} detected</div></div>
+    <div style="padding:8px 0 4px;font-size:10px;color:var(--dim);line-height:1.6"><strong style="color:var(--gold);letter-spacing:0.06em;text-transform:uppercase">If web fails:</strong> click any factor checkbox below to mark it manually. Manual ticks are permanent.</div>
   </div></div>`;
 }
 
@@ -1077,10 +960,7 @@ function buildFactorPanel(client) {
   const scoreFor = cat => {
     let total = 0;
     cats[cat].forEach(k => { if (flags[k]) total += FACTORS[k].pts; });
-    if (cat === 'SEO') {
-      const pos = client.gscData?.position || 0;
-      if (pos > 0) { if (pos <= 10) total += 20; else if (pos <= 15) total += 15; else if (pos <= 20) total += 10; else if (pos <= 30) total += 5; }
-    }
+    if (cat === 'SEO') { const pos = client.gscData?.position || 0; if (pos > 0) { if (pos <= 10) total += 20; else if (pos <= 15) total += 15; else if (pos <= 20) total += 10; else if (pos <= 30) total += 5; } }
     return Math.min(total, 100);
   };
   const buildSection = (cat, color) => {
@@ -1091,13 +971,12 @@ function buildFactorPanel(client) {
       const source = getFlagSource(client.id, key);
       const logHits = (client.liveAudit?._meta?.logHits?.[key]) || 0;
       let tag;
-      if (source === 'manual') tag = `<span class="factor-tag manual" title="Manual override — wins over audit, survives re-audits">Manual ${on?'✓':'✗'}</span>`;
-      else if (source === 'web') tag = `<span class="factor-tag live" title="Verified by live website crawl">Web ✓</span>`;
-      else if (source === 'log') tag = `<span class="factor-tag live" title="${logHits} mention(s) found in logbook + mastersheet">Log · ${logHits}</span>`;
+      if (source === 'manual') tag = `<span class="factor-tag manual" title="Manual override — wins over audit">Manual ${on?'✓':'✗'}</span>`;
+      else if (source === 'web') tag = `<span class="factor-tag live" title="Verified by live website crawl">Web</span>`;
+      else if (source === 'log') tag = `<span class="factor-tag live" title="${logHits} mention(s) in logbook + mastersheet">Log · ${logHits}</span>`;
       else if (client.auditing) tag = `<span class="factor-tag auditing">Auditing</span>`;
       else tag = `<span class="factor-tag unverified" title="Click checkbox to mark as done">Unverified</span>`;
-      // EVERY box is clickable — manual click always wins regardless of factor type
-      const check = `<div class="factor-check ${on?'on':'off'}" onclick="toggleManualFlag('${client.id}','${key}')" title="${f.desc} — click to toggle (permanent)">${on ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>` : ''}</div>`;
+      const check = `<div class="factor-check ${on?'on':'off'}" onclick="toggleManualFlag('${client.id}','${key}')" title="${f.desc} — click to toggle">${on ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>` : ''}</div>`;
       const label = `<div class="factor-label" onclick="toggleManualFlag('${client.id}','${key}')">${f.label}</div>`;
       return `<div class="factor-row">${check}${label}<div class="factor-pts">${f.pts} pts</div>${tag}</div>`;
     }).join('');
@@ -1106,40 +985,33 @@ function buildFactorPanel(client) {
       const pos = client.gscData?.position || 0;
       const posPts = pos > 0 ? (pos <= 10 ? 20 : pos <= 15 ? 15 : pos <= 20 ? 10 : pos <= 30 ? 5 : 0) : 0;
       const posOn = posPts >= 5;
-      gscRow = `<div class="factor-row"><div class="factor-check ${posOn?'on':'off'} locked">${posOn ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>` : ''}</div><div class="factor-label">Avg. GSC Position ${pos>0?`(pos ${pos})`:'(no data)'}</div><div class="factor-pts">${posPts}/20 pts</div><span class="factor-tag gsc">GSC</span></div>`;
+      gscRow = `<div class="factor-row"><div class="factor-check ${posOn?'on':'off'} locked">${posOn ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>` : ''}</div><div class="factor-label">Avg. GSC Position ${pos>0?`(pos ${pos})`:'(no data)'}</div><div class="factor-pts">${posPts}/20 pts</div><span class="factor-tag gsc">GSC</span></div>`;
     }
     return `<div class="factor-section"><div class="factor-section-title" style="color:${color}">${cat} Score<span class="factor-section-title-score" style="color:${color}">${score}/100</span></div>${rows}${gscRow}</div>`;
   };
   const manualCount = Object.keys(manual).length;
-  return `<div class="detail-card" style="margin-bottom:16px"><div class="detail-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><div class="detail-card-title">Score Factors — Click any box to override permanently</div>${manualCount?`<span style="margin-left:auto;font-size:11px;color:var(--accent);font-weight:700">${manualCount} manual override${manualCount===1?'':'s'} active</span>`:''}</div><div class="detail-card-body">
-    ${buildSection('SEO', '#6366F1')}
-    ${buildSection('AEO', '#EC4899')}
+  return `<div class="detail-card" style="margin-bottom:14px"><div class="detail-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><div class="detail-card-title">Score Factors</div>${manualCount?`<span style="margin-left:auto;font-size:10px;color:var(--gold);font-weight:800;letter-spacing:0.08em;text-transform:uppercase">${manualCount} Manual</span>`:''}</div><div class="detail-card-body">
+    ${buildSection('SEO', '#F5A623')}
+    ${buildSection('AEO', '#FFB627')}
     ${buildSection('LSEO', '#34D399')}
-    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:10px;color:var(--dim);line-height:1.7">
-      <strong style="color:var(--muted)">How this works (no placeholders):</strong>
-      <span class="factor-tag manual" style="font-size:8px">Manual ✓/✗</span> your click — always wins, survives re-audits.
-      <span class="factor-tag live" style="font-size:8px">Web ✓</span> verified by crawling the live site.
-      <span class="factor-tag live" style="font-size:8px">Log · N</span> N mentions found in logbook + mastersheet.
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-size:10px;color:var(--dim);line-height:1.7">
+      <strong style="color:var(--gold);letter-spacing:0.06em;text-transform:uppercase">How this works:</strong>
+      <span class="factor-tag manual" style="font-size:8px">Manual</span> your click — always wins.
+      <span class="factor-tag live" style="font-size:8px">Web</span> verified by live crawl.
+      <span class="factor-tag live" style="font-size:8px">Log · N</span> N mentions in logbook + mastersheet.
       <span class="factor-tag gsc" style="font-size:8px">GSC</span> from Search Console.
-      <span class="factor-tag unverified" style="font-size:8px">Unverified</span> no positive signal yet — click to mark done.
-      Priority: <strong>Manual → Web → Log → Unverified</strong>.
+      <span class="factor-tag unverified" style="font-size:8px">Unverified</span> click to mark done.
+      Priority: <strong style="color:var(--text)">Manual → Web → Log → Unverified</strong>.
     </div>
   </div></div>`;
 }
 
-// ════════════════════════════════════════════════════
-// TRACKING DETAIL (wrapped in try/catch so a single panel error can't blank the whole view)
-// ════════════════════════════════════════════════════
 function renderTrackingDetail() {
   const c=CLIENTS.find(x=>x.id===selectedClientId);if(!c)return;
   const wrap = document.getElementById('tracking-detail');
   if (!wrap) return;
-  try {
-    renderTrackingDetailInner(c, wrap);
-  } catch (err) {
-    console.error('[renderTrackingDetail] error', err);
-    wrap.innerHTML = `<div class="detail-card" style="padding:20px"><div style="color:#FCA5A5;font-weight:700;margin-bottom:8px">Render error</div><div style="font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-bottom:12px">${err.message}</div><button class="btn btn-ghost" onclick="clearAuditCache('${c.id}');location.reload()">Clear cache + reload</button></div>`;
-  }
+  try { renderTrackingDetailInner(c, wrap); }
+  catch (err) { console.error('[renderTrackingDetail] error', err); wrap.innerHTML = `<div class="detail-card" style="padding:20px"><div style="color:#FCA5A5;font-weight:800;margin-bottom:8px;letter-spacing:0.06em;text-transform:uppercase">Render Error</div><div style="font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-bottom:12px">${err.message}</div><button class="btn btn-ghost" onclick="clearAuditCache('${c.id}');location.reload()">Clear cache + reload</button></div>`; }
 }
 
 function renderTrackingDetailInner(c, wrap) {
@@ -1155,32 +1027,32 @@ function renderTrackingDetailInner(c, wrap) {
   const rangeBtns = ['7d','28d','90d','16m'].map(r=>`<button class="range-btn ${r===activeRange?'active':''}" onclick="changeChartRange('${c.id}','${r}',this)">${r==='16m'?'16M':r.toUpperCase()}</button>`).join('');
 
   wrap.innerHTML = `
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-      <div style="width:48px;height:48px;border-radius:12px;background:${c.color}22;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:${c.color};flex-shrink:0">${c.initials}</div>
-      <div style="flex:1;min-width:200px"><div style="font-size:16px;font-weight:700">${c.name}</div><div style="font-size:11px;color:var(--dim);font-family:'JetBrains Mono',monospace;margin-top:2px">${c.domain}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${c.location} · ${c.ga4} · ${c.gtm}</div></div>
+    <div style="background:#0A0A0A;border:1px solid var(--border);border-left:3px solid ${c.color};border-radius:3px;padding:18px;margin-bottom:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <div style="width:52px;height:52px;border-radius:3px;background:${c.color}22;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:${c.color};flex-shrink:0;letter-spacing:0.04em">${c.initials}</div>
+      <div style="flex:1;min-width:200px"><div style="font-family:'Oswald',sans-serif;font-size:18px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase">${c.name}</div><div style="font-size:11px;color:var(--dim);font-family:'JetBrains Mono',monospace;margin-top:3px">${c.domain}</div><div style="font-size:11px;color:var(--muted);margin-top:2px;letter-spacing:0.02em">${c.location} · ${c.ga4} · ${c.gtm}</div></div>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
         ${statusBadge(c)}
         <span class="badge ${gsc?'badge-live':'badge-gray'}">${gsc?'GSC':'GSC —'}</span>
         <span class="badge ${c.liveAudit?'badge-live':'badge-gray'}">${c.auditing?'Auditing':c.liveAudit?'Audit Live':'Audit —'}</span>
-        ${c.docId ? `<a class="btn btn-ghost" style="padding:5px 10px;font-size:11px" href="https://docs.google.com/document/d/${c.docId}/edit" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Logbook</a>` : ''}
-        ${c.masterSheetId ? `<a class="btn btn-ghost" style="padding:5px 10px;font-size:11px" href="https://docs.google.com/spreadsheets/d/${c.masterSheetId}/edit" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>Sheet</a>` : ''}
-        <button class="btn btn-ghost" style="padding:5px 10px;font-size:11px;border-color:rgba(239,68,68,0.3);color:#FCA5A5" onclick="if(confirm('Pause ${c.name.replace(/'/g,'\\\'')}?')) pauseClient('${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>Pause</button>
+        ${c.docId ? `<a class="btn btn-ghost" href="https://docs.google.com/document/d/${c.docId}/edit" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Log</a>` : ''}
+        ${c.masterSheetId ? `<a class="btn btn-ghost" href="https://docs.google.com/spreadsheets/d/${c.masterSheetId}/edit" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>Sheet</a>` : ''}
+        <button class="btn btn-ghost" style="border-color:rgba(229,57,53,0.3);color:#FCA5A5" onclick="if(confirm('Pause ${c.name.replace(/'/g,'\\\'')}?')) pauseClient('${c.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>Pause</button>
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;">${kpiTile('Live Leads',totalLeads,'#6366F1')}${kpiTile(`Leads ${days}d`,recent,'#3B82F6')}${kpiTile('Clicks',gsc?gsc.clicks.toLocaleString():'—','#F5A623')}${kpiTile('Avg. Pos.',gsc?gsc.position:'—','#10B981')}</div>
-    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;">${kpiTile('Impressions',gsc?gsc.impressions.toLocaleString():'—','#8B5CF6')}${kpiTile('CTR',gsc?gsc.ctr+'%':'—','#EC4899')}</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px;">${kpiTile('Live Leads',totalLeads,'#F5A623')}${kpiTile(`Leads ${days}d`,recent,'#FFB627')}${kpiTile('Clicks',gsc?gsc.clicks.toLocaleString():'—','#F5A623')}${kpiTile('Avg. Pos.',gsc?gsc.position:'—','#34D399')}</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px;">${kpiTile('Impressions',gsc?gsc.impressions.toLocaleString():'—','#A78BFA')}${kpiTile('CTR',gsc?gsc.ctr+'%':'—','#F472B6')}</div>
     ${buildAuditDetailsPanel(c)}
     ${buildFactorPanel(c)}
-    <div class="chart-card"><div class="chart-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="#6366F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><div class="chart-card-title">Organic Clicks</div><span style="font-size:11px;color:var(--dim);margin-left:4px">— ${rangeLabel}</span>${gsc?`<span style="margin-left:8px;font-size:11px;font-weight:700;color:#6366F1">${gsc.clicks.toLocaleString()}</span>`:''}<div class="range-selector" id="range-clicks-${c.id}">${rangeBtns}</div></div><div class="chart-card-body" style="height:200px">${gsc&&gsc.daily&&gsc.daily.length?`<canvas id="chart-clicks-${c.id}"></canvas>`:noDataState('No GSC click data')}</div></div>
+    <div class="chart-card"><div class="chart-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><div class="chart-card-title">Organic Clicks</div><span style="font-size:10px;color:var(--dim);margin-left:4px;letter-spacing:0.05em;text-transform:uppercase">${rangeLabel}</span>${gsc?`<span style="margin-left:8px;font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;color:var(--gold);letter-spacing:0.02em">${gsc.clicks.toLocaleString()}</span>`:''}<div class="range-selector" id="range-clicks-${c.id}">${rangeBtns}</div></div><div class="chart-card-body" style="height:200px">${gsc&&gsc.daily&&gsc.daily.length?`<canvas id="chart-clicks-${c.id}"></canvas>`:noDataState('No GSC click data')}</div></div>
     <div class="chart-grid">
-      <div class="chart-card"><div class="chart-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><div class="chart-card-title">Impressions</div><span style="font-size:11px;color:var(--dim);margin-left:4px">— ${rangeLabel}</span>${gsc?`<span style="margin-left:auto;font-size:11px;font-weight:700;color:#10B981">${gsc.impressions.toLocaleString()}</span>`:''}</div><div class="chart-card-body" style="height:170px">${gsc&&gsc.daily&&gsc.daily.length?`<canvas id="chart-impr-${c.id}"></canvas>`:noDataState('No data')}</div></div>
-      <div class="chart-card"><div class="chart-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><div class="chart-card-title">Avg. Position</div><span style="font-size:11px;color:var(--dim);margin-left:4px">— ${rangeLabel}</span>${gsc?`<span style="margin-left:auto;font-size:11px;font-weight:700;color:#F59E0B">pos ${gsc.position}</span>`:''}</div><div class="chart-card-body" style="height:170px">${gsc&&gsc.daily&&gsc.daily.length?`<canvas id="chart-pos-${c.id}"></canvas>`:noDataState('No data')}</div></div>
+      <div class="chart-card"><div class="chart-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><div class="chart-card-title">Impressions</div><span style="font-size:10px;color:var(--dim);margin-left:4px;letter-spacing:0.05em;text-transform:uppercase">${rangeLabel}</span>${gsc?`<span style="margin-left:auto;font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;color:#34D399">${gsc.impressions.toLocaleString()}</span>`:''}</div><div class="chart-card-body" style="height:170px">${gsc&&gsc.daily&&gsc.daily.length?`<canvas id="chart-impr-${c.id}"></canvas>`:noDataState('No data')}</div></div>
+      <div class="chart-card"><div class="chart-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><div class="chart-card-title">Avg. Position</div><span style="font-size:10px;color:var(--dim);margin-left:4px;letter-spacing:0.05em;text-transform:uppercase">${rangeLabel}</span>${gsc?`<span style="margin-left:auto;font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;color:var(--gold)">pos ${gsc.position}</span>`:''}</div><div class="chart-card-body" style="height:170px">${gsc&&gsc.daily&&gsc.daily.length?`<canvas id="chart-pos-${c.id}"></canvas>`:noDataState('No data')}</div></div>
     </div>
     <div class="detail-grid">
-      <div class="detail-card"><div class="detail-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><div class="detail-card-title">Top GSC Queries</div><span style="margin-left:auto" class="badge ${gsc?'badge-live':'badge-gray'}">${gsc?'Live':'—'}</span></div><div class="detail-card-body"><table class="kw-table"><thead><tr><th>Query</th><th>Clicks</th><th>Impr.</th><th>CTR</th><th>Pos.</th></tr></thead><tbody>${gsc&&gsc.topQueries.length?gsc.topQueries.map(q=>`<tr><td class="kw-query">${q.query}</td><td>${q.clicks}</td><td>${q.impressions.toLocaleString()}</td><td>${q.ctr}%</td><td>${posChip(q.position)}</td></tr>`).join(''):`<tr><td colspan="5" style="text-align:center;color:var(--dim);padding:16px">No data</td></tr>`}</tbody></table></div></div>
-      <div class="detail-card"><div class="detail-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><div class="detail-card-title">Active Alerts</div></div><div class="detail-card-body">${alerts.map(a=>`<div class="alert-item"><div class="alert-icon">${alertIcon(a.severity)}</div><div><div class="alert-title">${a.title}</div><div class="alert-detail">${a.detail}</div></div></div>`).join('')}</div></div>
+      <div class="detail-card"><div class="detail-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><div class="detail-card-title">Top GSC Queries</div><span style="margin-left:auto" class="badge ${gsc?'badge-live':'badge-gray'}">${gsc?'Live':'—'}</span></div><div class="detail-card-body"><table class="kw-table"><thead><tr><th>Query</th><th>Clicks</th><th>Impr.</th><th>CTR</th><th>Pos.</th></tr></thead><tbody>${gsc&&gsc.topQueries.length?gsc.topQueries.map(q=>`<tr><td class="kw-query">${q.query}</td><td>${q.clicks}</td><td>${q.impressions.toLocaleString()}</td><td>${q.ctr}%</td><td>${posChip(q.position)}</td></tr>`).join(''):`<tr><td colspan="5" style="text-align:center;color:var(--dim);padding:16px">No data</td></tr>`}</tbody></table></div></div>
+      <div class="detail-card"><div class="detail-card-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><div class="detail-card-title">Active Alerts</div></div><div class="detail-card-body">${alerts.map(a=>`<div class="alert-item"><div class="alert-icon">${alertIcon(a.severity)}</div><div><div class="alert-title">${a.title}</div><div class="alert-detail">${a.detail}</div></div></div>`).join('')}</div></div>
     </div>
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:16px"><div class="detail-card-header" style="padding:14px 18px;border-bottom:1px solid var(--border);"><svg viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><div class="detail-card-title">Recent Genuine Leads</div><span class="badge badge-live" style="margin-left:auto">${totalLeads} total</span></div>${clientLeads.length?clientLeads.map(lead=>{const ini=(lead.name||'?').split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();return `<div class="lead-row"><div class="lead-avatar" style="background:${c.color}22;color:${c.color}">${ini}</div><div style="flex:1;min-width:0"><div class="lead-name">${lead.name}</div><div class="lead-client">${lead.date}</div></div><div class="lead-phone">${(lead.phone||'').slice(0,20)}</div><div class="lead-msg">${(lead.msg||'').slice(0,80)}</div><div class="lead-source">${(lead.source||'Form').replace(' Form','').slice(0,20)}</div></div>`;}).join(''):`<div class="empty-state" style="padding:20px"><p>Syncing...</p></div>`}</div>
+    <div style="background:#0A0A0A;border:1px solid var(--border);border-radius:3px;overflow:hidden;margin-top:14px"><div class="detail-card-header" style="padding:14px 18px;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><div class="detail-card-title">Recent Genuine Leads</div><span class="badge badge-live" style="margin-left:auto">${totalLeads} Total</span></div>${clientLeads.length?clientLeads.map(lead=>{const ini=(lead.name||'?').split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();return `<div class="lead-row"><div class="lead-avatar" style="background:${c.color}22;color:${c.color}">${ini}</div><div style="flex:1;min-width:0"><div class="lead-name">${lead.name}</div><div class="lead-client">${lead.date}</div></div><div class="lead-phone">${(lead.phone||'').slice(0,20)}</div><div class="lead-msg">${(lead.msg||'').slice(0,80)}</div><div class="lead-source">${(lead.source||'Form').replace(' Form','').slice(0,20)}</div></div>`;}).join(''):`<div class="empty-state" style="padding:20px"><p>Syncing...</p></div>`}</div>
   `;
   if (gsc&&gsc.daily&&gsc.daily.length) setTimeout(()=>renderGSCCharts(c.id, gsc), 60);
 }
@@ -1200,27 +1072,27 @@ function renderGSCCharts(clientId, gsc) {
   const daily=gsc.daily;
   const step = daily.length>300?30:daily.length>90?14:daily.length>28?7:daily.length>14?3:1;
   const labels=daily.map(d=>{const dt=new Date(d.date+'T00:00:00');return dt.toLocaleDateString('en-US',{month:'short',day:'numeric'});});
-  const grid='rgba(255,255,255,0.04)', tick='#5A6270';
-  const font={family:"'Sora', sans-serif",size:10};
-  const tip={backgroundColor:'#13181F',borderColor:'#252D3A',borderWidth:1,titleFont:font,bodyFont:font,padding:10};
+  const grid='rgba(255,255,255,0.04)', tick='#6B6B6B';
+  const font={family:"'Inter', sans-serif",size:10};
+  const tip={backgroundColor:'#000',borderColor:'#F5A623',borderWidth:1,titleFont:font,bodyFont:font,padding:10};
   const lineBase={fill:true,tension:0.4,pointRadius:0,pointHoverRadius:5,borderWidth:2};
   const scaleBase={ticks:{color:tick,font,maxTicksLimit:8},grid:{color:grid},border:{color:'transparent'}};
   const xTicks={...scaleBase,ticks:{...scaleBase.ticks,maxRotation:0,callback:(v,i)=>i%step===0?labels[i]:''}};
   ['chart-clicks-','chart-impr-','chart-pos-'].forEach(pfx=>{const el=document.getElementById(pfx+clientId);if(el){const ex=Chart.getChart(el);if(ex)ex.destroy();}});
   const cc=document.getElementById('chart-clicks-'+clientId);
-  if(cc) new Chart(cc,{type:'line',data:{labels,datasets:[{...lineBase,data:daily.map(d=>d.clicks),borderColor:'#6366F1',backgroundColor:'rgba(99,102,241,0.08)'}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:tip},scales:{x:xTicks,y:{...scaleBase,min:0}}}});
+  if(cc) new Chart(cc,{type:'line',data:{labels,datasets:[{...lineBase,data:daily.map(d=>d.clicks),borderColor:'#F5A623',backgroundColor:'rgba(245,166,35,0.1)'}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:tip},scales:{x:xTicks,y:{...scaleBase,min:0}}}});
   const ci=document.getElementById('chart-impr-'+clientId);
-  if(ci) new Chart(ci,{type:'line',data:{labels,datasets:[{...lineBase,data:daily.map(d=>d.impressions),borderColor:'#10B981',backgroundColor:'rgba(16,185,129,0.07)'}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:tip},scales:{x:xTicks,y:{...scaleBase,min:0}}}});
+  if(ci) new Chart(ci,{type:'line',data:{labels,datasets:[{...lineBase,data:daily.map(d=>d.impressions),borderColor:'#34D399',backgroundColor:'rgba(52,211,153,0.08)'}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:tip},scales:{x:xTicks,y:{...scaleBase,min:0}}}});
   const cp=document.getElementById('chart-pos-'+clientId);
-  if(cp) new Chart(cp,{type:'line',data:{labels,datasets:[{...lineBase,fill:false,data:daily.map(d=>d.position),borderColor:'#F59E0B'}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{...tip,callbacks:{label:ctx=>'Position '+ctx.parsed.y.toFixed(1)}}},scales:{x:xTicks,y:{...scaleBase,reverse:true,ticks:{...scaleBase.ticks,callback:v=>v.toFixed(0)}}}}});
+  if(cp) new Chart(cp,{type:'line',data:{labels,datasets:[{...lineBase,fill:false,data:daily.map(d=>d.position),borderColor:'#FFB627'}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{...tip,callbacks:{label:ctx=>'Position '+ctx.parsed.y.toFixed(1)}}},scales:{x:xTicks,y:{...scaleBase,reverse:true,ticks:{...scaleBase.ticks,callback:v=>v.toFixed(0)}}}}});
 }
 
 function noDataState(msg) { return `<div class="no-data-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span>${msg}</span></div>`; }
 function statusBadge(c){const avg=(c.seo+c.aeo+c.lseo)/3;if(avg>=70)return'<span class="badge badge-green">Healthy</span>';if(avg>=55)return'<span class="badge badge-amber">Monitor</span>';return'<span class="badge badge-red">At Risk</span>';}
-function scorePill(label,val,auditing){const color=val>=70?'#34D399':val>=55?'#FCD34D':'#F87171';return`<div class="score-pill ${auditing?'auditing':''}"><div class="score-pill-label">${label}</div><div class="score-pill-val" style="color:${color}">${val}</div></div>`;}
+function scorePill(label,val,auditing){const color=val>=70?'#34D399':val>=55?'#F5A623':'#F87171';return`<div class="score-pill ${auditing?'auditing':''}"><div class="score-pill-label">${label}</div><div class="score-pill-val" style="color:${color}">${val}</div></div>`;}
 function posChip(pos){const cls=pos<=3?'pos-1-3':pos<=10?'pos-4-10':pos<=20?'pos-11-20':'pos-rest';return`<span class="pos-chip ${cls}">${pos}</span>`;}
-function kpiTile(label,value,color){return`<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;"><div style="font-size:10px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--dim);margin-bottom:6px">${label}</div><div style="font-size:22px;font-weight:800;color:${color};letter-spacing:-0.5px;line-height:1">${value}</div></div>`;}
-function alertIcon(severity){const c={critical:'#F87171',high:'#FCD34D',medium:'#FCD34D',info:'#60A5FA'}[severity]||'#60A5FA';return`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;}
+function kpiTile(label,value,color){return`<div style="background:#0A0A0A;border:1px solid var(--border);border-left:3px solid ${color};border-radius:3px;padding:14px 16px;"><div style="font-size:9px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);margin-bottom:6px">${label}</div><div style="font-family:'Oswald',sans-serif;font-size:26px;font-weight:700;color:${color};letter-spacing:-0.01em;line-height:1">${value}</div></div>`;}
+function alertIcon(severity){const c={critical:'#F87171',high:'#FCD34D',medium:'#F5A623',info:'#34D399'}[severity]||'#34D399';return`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;}
 function generateAlerts(c,recent,gsc){
   const a=[]; const flags = getEffectiveFlags(c.id);
   if(c.aeo<45) a.push({severity:'high',title:'AEO Low',detail:`Verified score ${c.aeo}/100. Tick missing boxes manually or run audit.`});
@@ -1234,9 +1106,6 @@ function generateAlerts(c,recent,gsc){
   return a;
 }
 
-// ════════════════════════════════════════════════════
-// REPORTS
-// ════════════════════════════════════════════════════
 async function generateReport() {
   const clientId=document.getElementById('report-client').value;
   const period=document.getElementById('report-period').value;
@@ -1280,7 +1149,7 @@ function buildStructuredReport(c,period,type,recentLeads,total,gsc){
 function renderRecentReports(){
   const el=document.getElementById('recent-reports-list');
   if(!generatedReports.length){el.innerHTML='<div class="empty-state"><p>No reports yet.</p></div>';return;}
-  el.innerHTML=generatedReports.map((r,i)=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="previewReport(${i})"><div style="width:36px;height:36px;border-radius:8px;background:var(--accent-m);display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#818CF8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div style="flex:1"><div style="font-size:13px;font-weight:600">${r.client}</div><div style="font-size:11px;color:var(--dim)">${r.type} | ${r.period} | ${r.date}</div></div><span class="badge badge-green">Ready</span></div>`).join('');
+  el.innerHTML=generatedReports.map((r,i)=>`<div style="background:#0A0A0A;border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:3px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="previewReport(${i})"><div style="width:36px;height:36px;border-radius:3px;background:var(--gold);display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div style="flex:1"><div style="font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase">${r.client}</div><div style="font-size:10px;color:var(--dim);letter-spacing:0.04em;margin-top:2px">${r.type} | ${r.period} | ${r.date}</div></div><span class="badge badge-green">Ready</span></div>`).join('');
 }
 function previewReport(i){const r=generatedReports[i];document.getElementById('report-output').style.display='block';document.getElementById('report-output').className='output-area';document.getElementById('report-output').innerHTML=r.text.replace(/\n/g,'<br>');document.getElementById('report-actions').style.display='flex';}
 function copyReport(){navigator.clipboard.writeText(document.getElementById('report-output').innerText).then(()=>showToast('Copied'));}
